@@ -165,6 +165,11 @@
   .stt th,.stt td{padding:7px 5px;text-align:center;white-space:nowrap}
   .stt th{color:var(--muted);font-size:11px;font-weight:700;border-bottom:1px solid var(--line)}
   .stt td.pos,.stt th.pos{width:20px;color:var(--muted)}
+  .stt td.ordc,.stt th.ordh{width:18px;padding:0 2px}
+  .ord{display:block;width:16px;height:11px;line-height:10px;font-size:9px;background:none;border:none;
+    color:var(--muted);cursor:pointer;padding:0;margin:0 auto}
+  .ord:hover{color:var(--gold)}
+  .ord.off{opacity:.2;cursor:default}
   .stt td.tcol,.stt th.tcol{text-align:left;width:99%;overflow:hidden;text-overflow:ellipsis;padding-left:8px}
   .stt td.tcol .flag{font-size:16px;margin-right:5px}
   .stt td.ptsc,.stt th.ptsc{font-weight:800}
@@ -288,6 +293,9 @@
   </section>
 
   <section class="view" id="v-bracket">
+    <h2 class="sec" id="hSimGroups"></h2>
+    <div class="standings-grid" id="simGroupsHost"></div>
+    <h2 class="sec" id="hSimBracket"></h2>
     <div id="bracketHost"></div>
   </section>
 
@@ -383,17 +391,6 @@ const PROVISIONAL = ["J","K","L"];
 const REAL_RESULTS_DATE = "27 Jun 2026";    // when the stored real results were last refreshed
 const REAL_RESULTS_VERSION = "2026-06-27";  // bump this when results change → auto-applies on next open
 
-// Real group-stage record for each third-placed team (points, goal diff, goals for).
-// Used to rank the 12 thirds and auto-qualify the best 8. Source: official standings, 26 Jun 2026.
-const REAL_THIRD_STATS = {
- "Sweden":{p:4,gd:0,gf:7}, "Ecuador":{p:4,gd:0,gf:2},
- "Bosnia and Herzegovina":{p:4,gd:-1,gf:5}, "Paraguay":{p:4,gd:-2,gf:2},
- "Croatia":{p:3,gd:-1,gf:3}, "South Korea":{p:3,gd:-1,gf:2},
- "Algeria":{p:3,gd:-2,gf:2}, "Scotland":{p:3,gd:-3,gf:1},
- "Cape Verde":{p:2,gd:0,gf:2}, "Uruguay":{p:2,gd:-1,gf:3}, "Belgium":{p:2,gd:0,gf:1}, "Iran":{p:3,gd:0,gf:3},
- "DR Congo":{p:1,gd:-1,gf:1}, "Senegal":{p:3,gd:2,gf:8}
-};
-
 // Real group-stage points per team (official standings, 26 Jun 2026).
 const REAL_POINTS = {
  "Mexico":9,"South Africa":4,"South Korea":3,"Czech Republic":1,
@@ -471,7 +468,7 @@ const STRINGS = {
  en:{ subtitle:"Rank each group · the 8 best third-place teams qualify automatically by points · then play out the knockouts.",
   btn_update:"↻ Update results", btn_clear:"↺ Clear everything", clear_confirm:"Clear all picks and start fresh?",
   realnote:"Results apply automatically when you open this page · last updated <b>{date}</b>. Groups <b>G, H, L</b> finish 27 Jun — provisional until then.",
-  tab_overview:"Overview", tab_matches:"Matches", tab_standings:"Standings", tab_bracket:"Bracket", tab_stats:"Stats", tab_players:"Players",
+  tab_overview:"Overview", tab_matches:"Matches", tab_standings:"Standings", tab_bracket:"Simulate", tab_stats:"Stats", tab_players:"Players",
   h_groupstage:"Group stage", hint_groupstage:"click in finishing order: 1st 🟢 · 2nd 🔵 · 3rd 🟡 · 4th ⚪ (4th fills automatically)",
   h_thirds:"Best third-place teams", hint_thirds:"ranked by real points — top 8 qualify automatically",
   third_note_progress:"Rank all 12 groups (or click {update}) to lock the 8 qualifiers. {n}/12 groups done.",
@@ -496,7 +493,7 @@ const STRINGS = {
  es:{ subtitle:"Ordena cada grupo · los 8 mejores terceros clasifican automáticamente por puntos · luego juega las eliminatorias.",
   btn_update:"↻ Actualizar resultados", btn_clear:"↺ Borrar todo", clear_confirm:"¿Borrar todo y empezar de nuevo?",
   realnote:"Los resultados se aplican solos al abrir la página · última actualización <b>{date}</b>. Los grupos <b>G, H, L</b> terminan el 27 jun — provisionales hasta entonces.",
-  tab_overview:"Resumen", tab_matches:"Partidos", tab_standings:"Posiciones", tab_bracket:"Llave", tab_stats:"Estadísticas", tab_players:"Jugadores",
+  tab_overview:"Resumen", tab_matches:"Partidos", tab_standings:"Posiciones", tab_bracket:"Simular", tab_stats:"Estadísticas", tab_players:"Jugadores",
   h_groupstage:"Fase de grupos", hint_groupstage:"haz clic en orden de clasificación: 1.º 🟢 · 2.º 🔵 · 3.º 🟡 · 4.º ⚪ (el 4.º se completa solo)",
   h_thirds:"Mejores terceros", hint_thirds:"ordenados por puntos reales — los 8 mejores clasifican",
   third_note_progress:"Ordena los 12 grupos (o pulsa {update}) para fijar los 8 clasificados. {n}/12 grupos listos.",
@@ -521,7 +518,7 @@ const STRINGS = {
  pt:{ subtitle:"Classifique cada grupo · os 8 melhores terceiros avançam automaticamente por pontos · depois jogue o mata-mata.",
   btn_update:"↻ Atualizar resultados", btn_clear:"↺ Limpar tudo", clear_confirm:"Limpar tudo e começar de novo?",
   realnote:"Os resultados são aplicados sozinhos ao abrir a página · última atualização <b>{date}</b>. Os grupos <b>G, H, L</b> terminam em 27 jun — provisórios até lá.",
-  tab_overview:"Visão geral", tab_matches:"Jogos", tab_standings:"Classificação", tab_bracket:"Chaveamento", tab_stats:"Estatísticas", tab_players:"Jogadores",
+  tab_overview:"Visão geral", tab_matches:"Jogos", tab_standings:"Classificação", tab_bracket:"Simular", tab_stats:"Estatísticas", tab_players:"Jogadores",
   h_groupstage:"Fase de grupos", hint_groupstage:"clique na ordem de classificação: 1º 🟢 · 2º 🔵 · 3º 🟡 · 4º ⚪ (o 4º preenche sozinho)",
   h_thirds:"Melhores terceiros", hint_thirds:"ordenados por pontos reais — os 8 melhores avançam",
   third_note_progress:"Classifique os 12 grupos (ou clique em {update}) para definir os 8 classificados. {n}/12 grupos prontos.",
@@ -562,13 +559,16 @@ Object.assign(STRINGS.pt,{ m_groupstage:"Jogos da fase de grupos", m_knockout:"M
   cr7_tag:"⭐ Nosso craque", cr7_note:"Primeiro a marcar em seis Copas do Mundo diferentes · maior artilheiro de Portugal em Copas (10 gols)." });
 Object.assign(STRINGS.en,{ m_sched:"Date, venue & kickoff:", m_tbd:"TBD",
   col_mp:"MP",col_w:"W",col_d:"D",col_l:"L",col_gf:"GF",col_ga:"GA",col_gd:"GD",col_pts:"Pts",
-  hint_standings:"live tables — top 2 advance (green), best 3rd-place in the mix (yellow)" });
+  hint_standings:"live tables — top 2 advance (green), 3rd-place in the mix (yellow)",
+  hint_sim:"use ▲▼ to set each group, then play the bracket below — or hit Update results for the real ones" });
 Object.assign(STRINGS.es,{ m_sched:"Fecha, sede y hora:", m_tbd:"Por definir",
   col_mp:"PJ",col_w:"G",col_d:"E",col_l:"P",col_gf:"GF",col_ga:"GC",col_gd:"DG",col_pts:"Pts",
-  hint_standings:"tablas en vivo — los 2 primeros avanzan (verde), mejores terceros en juego (amarillo)" });
+  hint_standings:"tablas en vivo — los 2 primeros avanzan (verde), 3.º en juego (amarillo)",
+  hint_sim:"usa ▲▼ para definir cada grupo y juega la llave abajo — o pulsa Actualizar resultados para los reales" });
 Object.assign(STRINGS.pt,{ m_sched:"Data, local e horário:", m_tbd:"A definir",
   col_mp:"J",col_w:"V",col_d:"E",col_l:"D",col_gf:"GP",col_ga:"GC",col_gd:"SG",col_pts:"Pts",
-  hint_standings:"tabelas ao vivo — os 2 primeiros avançam (verde), melhores terceiros em disputa (amarelo)" });
+  hint_standings:"tabelas ao vivo — os 2 primeiros avançam (verde), 3º em disputa (amarelo)",
+  hint_sim:"use ▲▼ para definir cada grupo e jogue o chaveamento abaixo — ou toque em Atualizar resultados para os reais" });
 // Real schedule + results from the official date-by-date fixtures (extracted 26 Jun 2026).
 // h = home team, s = [home goals, away goals] (omitted = not played yet). date/venue for every match; time (CST) where known.
 const MATCH_INFO = {
@@ -670,8 +670,8 @@ function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
 function team(name){ return {name, flag:FLAG[name]||"🏳️"}; }
 
 // ---------- GROUPS ----------
-// Compute a real league table for one group from the match results (MATCH_INFO).
-function computeGroupTable(L){
+// Real stats per team in a group, from the match results (MATCH_INFO). Returns {team:{...}}.
+function groupStats(L){
   const teams={}; GROUPS[L].forEach(tm=>teams[tm]={t:tm,mp:0,w:0,d:0,l:0,gf:0,ga:0,pts:0});
   const ts=GROUPS[L];
   for(let i=0;i<ts.length;i++) for(let j=i+1;j<ts.length;j++){
@@ -684,32 +684,57 @@ function computeGroupTable(L){
     else if(hg<ag){ A.w++; A.pts+=3; H.l++; }
     else { H.d++; A.d++; H.pts++; A.pts++; }
   }
-  const arr=Object.values(teams);
-  arr.forEach(o=>o.gd=o.gf-o.ga);
-  arr.sort((a,b)=> b.pts-a.pts || b.gd-a.gd || b.gf-a.gf || (a.t<b.t?-1:1));
-  return arr;
+  Object.values(teams).forEach(o=>o.gd=o.gf-o.ga);
+  return teams;
 }
-// Standings tab: a league table per group (MP W D L GF GA GD Pts), top 2 green, 3rd yellow.
-function renderStandings(){
+// The finishing order used by the bracket: the 3 ranked teams + the leftover as 4th.
+function fullOrder(L){
+  const ranks=(state.ranks[L]||[]).slice(0,3);
+  const rest=GROUPS[L].filter(tm=>!ranks.includes(tm));
+  return ranks.concat(rest);
+}
+// Move a team up/down in a group's finishing order (the simulator). Updates the bracket.
+function moveTeam(L,idx,dir){
+  const order=fullOrder(L); const j=idx+dir;
+  if(j<0 || j>=order.length) return;
+  const tmp=order[idx]; order[idx]=order[j]; order[j]=tmp;
+  state.ranks[L]=order.slice(0,3);
+  state.thirds=computeThirds().qualifiedLetters;
+  if(bracketReady()) autoPlayBracket(true);   // keep the bracket complete, preserving valid picks
+  save();
+  const y=window.scrollY; renderAll(); window.scrollTo(0,y);
+}
+// Render a league table per group into hostId. editable=true adds ▲▼ reorder controls (Simulate tab).
+function renderGroupTables(hostId, editable){
+  const host=document.getElementById(hostId); if(!host) return;
   let html="";
   LETTERS.forEach(L=>{
-    const rows=computeGroupTable(L);
+    const stats=groupStats(L), order=fullOrder(L);
     const prov=PROVISIONAL.includes(L)?` <span class="provtag">${t('provisional')}</span>`:``;
     html+=`<div class="sttable"><div class="sthead">${t('group')} ${L}${prov}</div>`
-      +`<table class="stt"><thead><tr><th class="pos"></th><th class="tcol"></th>`
+      +`<table class="stt"><thead><tr><th class="pos"></th>${editable?'<th class="ordh"></th>':''}<th class="tcol"></th>`
       +`<th>${t('col_mp')}</th><th>${t('col_w')}</th><th>${t('col_d')}</th><th>${t('col_l')}</th>`
       +`<th>${t('col_gf')}</th><th>${t('col_ga')}</th><th>${t('col_gd')}</th><th class="ptsc">${t('col_pts')}</th></tr></thead><tbody>`;
-    rows.forEach((o,i)=>{
+    order.forEach((tm,i)=>{
+      const o=stats[tm];
       const cls=i<2?"adv":(i===2?"p3":"");
-      html+=`<tr class="${cls}"><td class="pos">${i+1}</td>`
-        +`<td class="tcol"><span class="flag">${FLAG[o.t]||"🏳️"}</span> ${tname(o.t)}</td>`
+      let ordcell="";
+      if(editable){
+        const up = i>0 ? `<button class="ord" onclick="moveTeam('${L}',${i},-1)">▲</button>` : `<span class="ord off">▲</span>`;
+        const dn = i<order.length-1 ? `<button class="ord" onclick="moveTeam('${L}',${i},1)">▼</button>` : `<span class="ord off">▼</span>`;
+        ordcell=`<td class="ordc">${up}${dn}</td>`;
+      }
+      html+=`<tr class="${cls}"><td class="pos">${i+1}</td>${ordcell}`
+        +`<td class="tcol"><span class="flag">${FLAG[tm]||"🏳️"}</span> ${tname(tm)}</td>`
         +`<td>${o.mp}</td><td>${o.w}</td><td>${o.d}</td><td>${o.l}</td>`
         +`<td>${o.gf}</td><td>${o.ga}</td><td>${o.gd>0?"+":""}${o.gd}</td><td class="ptsc">${o.pts}</td></tr>`;
     });
     html+=`</tbody></table></div>`;
   });
-  document.getElementById("standingsHost").innerHTML=html;
+  host.innerHTML=html;
 }
+function renderStandings(){ renderGroupTables("standingsHost", false); }  // Standings tab: read-only
+function renderSimGroups(){ renderGroupTables("simGroupsHost", true); }   // Simulate tab: editable
 function groupDone(L){ return (state.ranks[L]||[]).length===3; }
 function allGroupsDone(){ return LETTERS.every(groupDone); }
 function placed(L,pos){ // pos 0=winner,1=runner,2=third
@@ -723,7 +748,8 @@ function placed(L,pos){ // pos 0=winner,1=runner,2=third
 function computeThirds(){
   const list = LETTERS.filter(groupDone).map(L=>{
     const name = placed(L,2);
-    const s = REAL_THIRD_STATS[name] || null;
+    const st = groupStats(L)[name];
+    const s = st ? {p:st.pts, gd:st.gd, gf:st.gf} : null;
     return {L, name, s};
   });
   list.sort((a,b)=>{
@@ -799,7 +825,7 @@ function winnerOf(round, idx){
 function bracketReady(){ return allGroupsDone() && state.thirds.length===8; }
 // Auto-play the knockouts so the bracket isn't blank: the stronger group-stage team
 // (more points, then goal difference, then goals) advances in every tie. Fully editable after.
-function autoPlayBracket(){
+function autoPlayBracket(onlyEmpty){
   const tally={};
   Object.entries(MATCH_INFO).forEach(([k,m])=>{
     if(!m.s) return;
@@ -810,7 +836,12 @@ function autoPlayBracket(){
   });
   const str=tm=>{ const o=tally[tm]||{p:0,gd:0,gf:0}; return o.p*1000+o.gd*10+o.gf; };
   [16,8,4,2,1].forEach((cnt,round)=>{
-    for(let i=0;i<cnt;i++){ const [a,b]=matchTeams(round,i); if(a&&b) state.picks[round+"-"+i]=(str(a)>=str(b)?a:b); }
+    for(let i=0;i<cnt;i++){
+      const [a,b]=matchTeams(round,i); if(!a||!b) continue;
+      const cur=state.picks[round+"-"+i];
+      if(onlyEmpty && (cur===a||cur===b)) continue;   // keep the user's still-valid pick
+      state.picks[round+"-"+i]=(str(a)>=str(b)?a:b);
+    }
   });
 }
 
@@ -963,6 +994,8 @@ function applyLang(lang){
   document.querySelectorAll("[data-i18n]").forEach(el=> el.textContent = t(el.getAttribute("data-i18n")));
   document.getElementById("hGroupStage").innerHTML = `${t('h_groupstage')} <span class="hint">${t('hint_standings')}</span>`;
   document.getElementById("hThirds").innerHTML = `${t('h_thirds')} <span class="hint">${t('hint_thirds')}</span>`;
+  document.getElementById("hSimGroups").innerHTML = `${t('h_groupstage')} <span class="hint">${t('hint_sim')}</span>`;
+  document.getElementById("hSimBracket").innerHTML = t('m_knockout');
   document.getElementById("realNote").innerHTML = t('realnote',{date:REAL_RESULTS_DATE});
   document.getElementById("footer").innerHTML = `${t('footer1')}<br>${t('footer2',{date:REAL_RESULTS_DATE})}`;
   const ls=document.getElementById("langSel"); if(ls) ls.value=LANG;
@@ -1128,7 +1161,7 @@ function showView(name){
 
 function renderAll(){
   state.thirds = computeThirds().qualifiedLetters; // auto-qualified best 8
-  renderStandings(); renderThirds(); renderBracket();
+  renderStandings(); renderSimGroups(); renderThirds(); renderBracket();
   renderOverview(); renderMatches(); renderStats(); renderPlayers();
 }
 
