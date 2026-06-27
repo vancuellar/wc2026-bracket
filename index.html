@@ -356,15 +356,15 @@ const REAL_RESULTS = {
  E:["Germany","Ivory Coast","Ecuador","Curaçao"],
  F:["Netherlands","Japan","Sweden","Tunisia"],
  G:["Egypt","Iran","Belgium","New Zealand"],
- H:["Spain","Uruguay","Cape Verde","Saudi Arabia"],
+ H:["Spain","Cape Verde","Uruguay","Saudi Arabia"],
  I:["France","Norway","Senegal","Iraq"],
  J:["Argentina","Austria","Algeria","Jordan"],
  K:["Colombia","Portugal","DR Congo","Uzbekistan"],
  L:["England","Ghana","Croatia","Panama"]
 };
-const PROVISIONAL = ["G","H","J","K","L"];
+const PROVISIONAL = ["G","J","K","L"];
 const REAL_RESULTS_DATE = "26 Jun 2026";    // when the stored real results were last refreshed
-const REAL_RESULTS_VERSION = "2026-06-26";  // bump this when results change → auto-applies on next open
+const REAL_RESULTS_VERSION = "2026-06-26b";  // bump this when results change → auto-applies on next open
 
 // Real group-stage record for each third-placed team (points, goal diff, goals for).
 // Used to rank the 12 thirds and auto-qualify the best 8. Source: official standings, 26 Jun 2026.
@@ -373,7 +373,7 @@ const REAL_THIRD_STATS = {
  "Bosnia and Herzegovina":{p:4,gd:-1,gf:5}, "Paraguay":{p:4,gd:-2,gf:2},
  "Croatia":{p:3,gd:-1,gf:3}, "South Korea":{p:3,gd:-1,gf:2},
  "Algeria":{p:3,gd:-2,gf:2}, "Scotland":{p:3,gd:-3,gf:1},
- "Cape Verde":{p:2,gd:0,gf:2}, "Belgium":{p:2,gd:0,gf:1},
+ "Cape Verde":{p:2,gd:0,gf:2}, "Uruguay":{p:2,gd:-1,gf:3}, "Belgium":{p:2,gd:0,gf:1},
  "DR Congo":{p:1,gd:-1,gf:1}, "Senegal":{p:3,gd:2,gf:8}
 };
 
@@ -386,7 +386,7 @@ const REAL_POINTS = {
  "Germany":6,"Ivory Coast":6,"Ecuador":4,"Curaçao":1,
  "Netherlands":7,"Japan":5,"Sweden":4,"Tunisia":0,
  "Egypt":4,"Iran":2,"Belgium":2,"New Zealand":1,
- "Spain":4,"Uruguay":2,"Cape Verde":2,"Saudi Arabia":1,
+ "Spain":7,"Uruguay":2,"Cape Verde":3,"Saudi Arabia":2,
  "France":9,"Norway":6,"Senegal":3,"Iraq":0,
  "Argentina":6,"Austria":3,"Algeria":3,"Jordan":0,
  "Colombia":6,"Portugal":4,"DR Congo":1,"Uzbekistan":0,
@@ -603,8 +603,8 @@ const MATCH_INFO = {
  "Saudi Arabia|Uruguay":{h:"Saudi Arabia",s:[1,1],date:"Jun 15",venue:"Hard Rock Stadium, Miami Gardens"},
  "Saudi Arabia|Spain":{h:"Spain",s:[4,0],date:"Jun 21",venue:"Mercedes-Benz Stadium, Atlanta"},
  "Cape Verde|Uruguay":{h:"Uruguay",s:[2,2],date:"Jun 21",venue:"Hard Rock Stadium, Miami Gardens"},
- "Cape Verde|Saudi Arabia":{date:"Jun 26",venue:"NRG Stadium, Houston"},
- "Spain|Uruguay":{date:"Jun 26",venue:"Estadio Akron, Guadalajara"},
+ "Cape Verde|Saudi Arabia":{h:"Cape Verde",s:[0,0],date:"Jun 26",venue:"NRG Stadium, Houston"},
+ "Spain|Uruguay":{h:"Uruguay",s:[0,1],date:"Jun 26",venue:"Estadio Akron, Guadalajara"},
  // Group I (complete)
  "France|Senegal":{h:"France",s:[3,1],date:"Jun 16",venue:"MetLife Stadium, East Rutherford"},
  "Iraq|Norway":{h:"Iraq",s:[1,4],date:"Jun 16",venue:"Gillette Stadium, Foxborough"},
