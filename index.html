@@ -796,6 +796,22 @@ function winnerOf(round, idx){
   return null;
 }
 function bracketReady(){ return allGroupsDone() && state.thirds.length===8; }
+// Auto-play the knockouts so the bracket isn't blank: the stronger group-stage team
+// (more points, then goal difference, then goals) advances in every tie. Fully editable after.
+function autoPlayBracket(){
+  const tally={};
+  Object.entries(MATCH_INFO).forEach(([k,m])=>{
+    if(!m.s) return;
+    const [x,y]=k.split("|"); const home=m.h, away=(home===x?y:x), hg=m.s[0], ag=m.s[1];
+    tally[home]=tally[home]||{p:0,gd:0,gf:0}; tally[away]=tally[away]||{p:0,gd:0,gf:0};
+    tally[home].gf+=hg; tally[home].gd+=hg-ag; tally[away].gf+=ag; tally[away].gd+=ag-hg;
+    if(hg>ag) tally[home].p+=3; else if(hg<ag) tally[away].p+=3; else { tally[home].p++; tally[away].p++; }
+  });
+  const str=tm=>{ const o=tally[tm]||{p:0,gd:0,gf:0}; return o.p*1000+o.gd*10+o.gf; };
+  [16,8,4,2,1].forEach((cnt,round)=>{
+    for(let i=0;i<cnt;i++){ const [a,b]=matchTeams(round,i); if(a&&b) state.picks[round+"-"+i]=(str(a)>=str(b)?a:b); }
+  });
+}
 
 // Seed tag shown beside each Round-of-32 team (e.g. 1°A, 2°C, 3°).
 function seedLabel(tok){
@@ -1132,6 +1148,14 @@ document.addEventListener("click",(e)=>{
 if(state.realVersion !== REAL_RESULTS_VERSION){
   LETTERS.forEach(L=> state.ranks[L] = REAL_RESULTS[L].slice(0,3));
   state.realVersion = REAL_RESULTS_VERSION;
+  save();
+}
+
+// Finish the bracket once on first open so it shows a full prediction (editable afterwards).
+if(!state.autoFilled && Object.keys(state.picks).length===0){
+  state.thirds = computeThirds().qualifiedLetters;
+  if(bracketReady()) autoPlayBracket();
+  state.autoFilled = true;
   save();
 }
 
