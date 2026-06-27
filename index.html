@@ -362,7 +362,7 @@ const REAL_RESULTS = {
  K:["Colombia","Portugal","DR Congo","Uzbekistan"],
  L:["England","Ghana","Croatia","Panama"]
 };
-const PROVISIONAL = ["G","H","L"];
+const PROVISIONAL = ["G","H","J","K","L"];
 const REAL_RESULTS_DATE = "26 Jun 2026";    // when the stored real results were last refreshed
 const REAL_RESULTS_VERSION = "2026-06-26";  // bump this when results change → auto-applies on next open
 
@@ -374,7 +374,7 @@ const REAL_THIRD_STATS = {
  "Croatia":{p:3,gd:-1,gf:3}, "South Korea":{p:3,gd:-1,gf:2},
  "Algeria":{p:3,gd:-2,gf:2}, "Scotland":{p:3,gd:-3,gf:1},
  "Cape Verde":{p:2,gd:0,gf:2}, "Belgium":{p:2,gd:0,gf:1},
- "DR Congo":{p:1,gd:-1,gf:1}, "Senegal":{p:0,gd:-3,gf:3}
+ "DR Congo":{p:1,gd:-1,gf:1}, "Senegal":{p:3,gd:2,gf:8}
 };
 
 // Real group-stage points per team (official standings, 26 Jun 2026).
@@ -387,7 +387,7 @@ const REAL_POINTS = {
  "Netherlands":7,"Japan":5,"Sweden":4,"Tunisia":0,
  "Egypt":4,"Iran":2,"Belgium":2,"New Zealand":1,
  "Spain":4,"Uruguay":2,"Cape Verde":2,"Saudi Arabia":1,
- "France":9,"Norway":6,"Senegal":0,"Iraq":0,
+ "France":9,"Norway":6,"Senegal":3,"Iraq":0,
  "Argentina":6,"Austria":3,"Algeria":3,"Jordan":0,
  "Colombia":6,"Portugal":4,"DR Congo":1,"Uzbekistan":0,
  "England":4,"Ghana":4,"Croatia":3,"Panama":0
@@ -543,85 +543,96 @@ Object.assign(STRINGS.es,{ m_groupstage:"Partidos de fase de grupos", m_knockout
 Object.assign(STRINGS.pt,{ m_groupstage:"Jogos da fase de grupos", m_knockout:"Mata-mata",
   m_alllater:"As fases seguintes dependem das suas escolhas — veja a aba {bracket}.",
   cr7_tag:"⭐ Nosso craque", cr7_note:"Primeiro a marcar em seis Copas do Mundo diferentes · maior artilheiro de Portugal em Copas (10 gols)." });
-Object.assign(STRINGS.en,{ m_sched:"Date, venue & kickoff:" });
-Object.assign(STRINGS.es,{ m_sched:"Fecha, sede y hora:" });
-Object.assign(STRINGS.pt,{ m_sched:"Data, local e horário:" });
-// Real match results, every score validated against the official group points.
-// h = home team, s = [home goals, away goals]. The opener also carries date/venue/kickoff (CST).
-// Pending/undecided final-round games are intentionally left out (shown as "vs").
+Object.assign(STRINGS.en,{ m_sched:"Date, venue & kickoff:", m_tbd:"TBD" });
+Object.assign(STRINGS.es,{ m_sched:"Fecha, sede y hora:", m_tbd:"Por definir" });
+Object.assign(STRINGS.pt,{ m_sched:"Data, local e horário:", m_tbd:"A definir" });
+// Real schedule + results from the official date-by-date fixtures (extracted 26 Jun 2026).
+// h = home team, s = [home goals, away goals] (omitted = not played yet). date/venue for every match; time (CST) where known.
 const MATCH_INFO = {
  // Group A
- "Mexico|South Africa":{h:"Mexico",s:[2,0],date:"Jun 11, 2026",venue:"Estadio Azteca, Mexico City",time:"2:00 PM CST"},
- "Mexico|South Korea":{h:"Mexico",s:[1,0]},
- "Czech Republic|Mexico":{h:"Mexico",s:[3,0]},
- "Czech Republic|South Africa":{h:"South Africa",s:[1,1]},
- "South Africa|South Korea":{h:"South Africa",s:[1,0]},
- "Czech Republic|South Korea":{h:"South Korea",s:[2,1]},
+ "Mexico|South Africa":{h:"Mexico",s:[2,0],date:"Jun 11",venue:"Estadio Banorte, Mexico City",time:"2:00 PM CST"},
+ "Czech Republic|South Korea":{h:"South Korea",s:[2,1],date:"Jun 11",venue:"Estadio Akron, Guadalajara"},
+ "Mexico|South Korea":{h:"Mexico",s:[1,0],date:"Jun 18",venue:"Estadio Akron, Guadalajara"},
+ "Czech Republic|South Africa":{h:"Czech Republic",s:[1,1],date:"Jun 18",venue:"Mercedes-Benz Stadium, Atlanta"},
+ "Czech Republic|Mexico":{h:"Czech Republic",s:[0,3],date:"Jun 24",venue:"Estadio Banorte, Mexico City"},
+ "South Africa|South Korea":{h:"South Africa",s:[1,0],date:"Jun 24",venue:"Estadio BBVA, Guadalupe"},
  // Group B
- "Canada|Qatar":{h:"Canada",s:[6,0]},
- "Bosnia and Herzegovina|Switzerland":{h:"Switzerland",s:[4,1]},
- "Bosnia and Herzegovina|Canada":{h:"Canada",s:[1,1]},
- "Qatar|Switzerland":{h:"Qatar",s:[1,1]},
- "Canada|Switzerland":{h:"Switzerland",s:[2,1]},
- "Bosnia and Herzegovina|Qatar":{h:"Bosnia and Herzegovina",s:[3,1]},
+ "Bosnia and Herzegovina|Canada":{h:"Canada",s:[1,1],date:"Jun 12",venue:"BMO Field, Toronto"},
+ "Qatar|Switzerland":{h:"Qatar",s:[1,1],date:"Jun 13",venue:"Levi's Stadium, Santa Clara"},
+ "Bosnia and Herzegovina|Switzerland":{h:"Switzerland",s:[4,1],date:"Jun 18",venue:"SoFi Stadium, Inglewood"},
+ "Canada|Qatar":{h:"Canada",s:[6,0],date:"Jun 18",venue:"BC Place, Vancouver"},
+ "Bosnia and Herzegovina|Qatar":{h:"Bosnia and Herzegovina",s:[3,1],date:"Jun 24",venue:"Lumen Field, Seattle"},
+ "Canada|Switzerland":{h:"Switzerland",s:[2,1],date:"Jun 24",venue:"BC Place, Vancouver"},
  // Group C
- "Brazil|Morocco":{h:"Brazil",s:[1,1]},
- "Haiti|Scotland":{h:"Scotland",s:[1,0]},
- "Brazil|Scotland":{h:"Brazil",s:[3,0]},
- "Haiti|Morocco":{h:"Morocco",s:[4,2]},
- "Brazil|Haiti":{h:"Brazil",s:[3,0]},
- "Morocco|Scotland":{h:"Morocco",s:[1,0]},
+ "Brazil|Morocco":{h:"Brazil",s:[1,1],date:"Jun 13",venue:"MetLife Stadium, East Rutherford"},
+ "Haiti|Scotland":{h:"Haiti",s:[0,1],date:"Jun 13",venue:"Gillette Stadium, Foxborough"},
+ "Brazil|Haiti":{h:"Brazil",s:[3,0],date:"Jun 19",venue:"Lincoln Financial Field, Philadelphia"},
+ "Morocco|Scotland":{h:"Scotland",s:[0,1],date:"Jun 19",venue:"Gillette Stadium, Foxborough"},
+ "Brazil|Scotland":{h:"Scotland",s:[0,3],date:"Jun 24",venue:"Hard Rock Stadium, Miami Gardens"},
+ "Haiti|Morocco":{h:"Morocco",s:[4,2],date:"Jun 24",venue:"Mercedes-Benz Stadium, Atlanta"},
  // Group D
- "Paraguay|United States":{h:"United States",s:[4,1]},
- "Paraguay|Turkey":{h:"Paraguay",s:[1,0]},
- "Australia|United States":{h:"United States",s:[2,0]},
- "Turkey|United States":{h:"Turkey",s:[3,2]},
- "Australia|Turkey":{h:"Australia",s:[2,0]},
- "Australia|Paraguay":{h:"Paraguay",s:[0,0]},
+ "Paraguay|United States":{h:"United States",s:[4,1],date:"Jun 12",venue:"SoFi Stadium, Inglewood"},
+ "Australia|Turkey":{h:"Australia",s:[2,0],date:"Jun 13",venue:"BC Place, Vancouver"},
+ "Australia|United States":{h:"United States",s:[2,0],date:"Jun 19",venue:"Lumen Field, Seattle"},
+ "Paraguay|Turkey":{h:"Turkey",s:[0,1],date:"Jun 19",venue:"Levi's Stadium, Santa Clara"},
+ "Australia|Paraguay":{h:"Paraguay",s:[0,0],date:"Jun 25",venue:"Levi's Stadium, Santa Clara"},
+ "Turkey|United States":{h:"Turkey",s:[3,2],date:"Jun 25",venue:"SoFi Stadium, Inglewood"},
  // Group E
- "Ecuador|Germany":{h:"Ecuador",s:[2,1]},
- "Curaçao|Ivory Coast":{h:"Ivory Coast",s:[2,0]},
- "Curaçao|Germany":{h:"Germany",s:[7,1]},
- "Ecuador|Ivory Coast":{h:"Ivory Coast",s:[1,0]},
- "Curaçao|Ecuador":{h:"Ecuador",s:[0,0]},
- "Germany|Ivory Coast":{h:"Germany",s:[2,1]},
+ "Curaçao|Germany":{h:"Germany",s:[7,1],date:"Jun 14",venue:"NRG Stadium, Houston"},
+ "Ecuador|Ivory Coast":{h:"Ivory Coast",s:[1,0],date:"Jun 14",venue:"Lincoln Financial Field, Philadelphia"},
+ "Germany|Ivory Coast":{h:"Germany",s:[2,1],date:"Jun 20",venue:"BMO Field, Toronto"},
+ "Curaçao|Ecuador":{h:"Ecuador",s:[0,0],date:"Jun 20",venue:"Arrowhead Stadium, Kansas City"},
+ "Curaçao|Ivory Coast":{h:"Curaçao",s:[0,2],date:"Jun 25",venue:"Lincoln Financial Field, Philadelphia"},
+ "Ecuador|Germany":{h:"Ecuador",s:[2,1],date:"Jun 25",venue:"MetLife Stadium, East Rutherford"},
  // Group F
- "Japan|Sweden":{h:"Japan",s:[1,1]},
- "Netherlands|Tunisia":{h:"Netherlands",s:[3,1]},
- "Netherlands|Sweden":{h:"Netherlands",s:[5,1]},
- "Japan|Tunisia":{h:"Japan",s:[4,0]},
- "Japan|Netherlands":{h:"Japan",s:[1,1]},
- "Sweden|Tunisia":{h:"Sweden",s:[5,1]},
- // Group G (matchday 3 on 27 Jun still to play)
- "Belgium|Iran":{h:"Belgium",s:[0,0]},
- "Egypt|New Zealand":{h:"Egypt",s:[3,1]},
- "Belgium|Egypt":{h:"Belgium",s:[1,1]},
- "Iran|New Zealand":{h:"Iran",s:[2,2]},
- // Group H (matchday 3 on 27 Jun still to play)
- "Saudi Arabia|Spain":{h:"Spain",s:[4,0]},
- "Cape Verde|Uruguay":{h:"Uruguay",s:[2,2]},
- "Cape Verde|Spain":{h:"Spain",s:[0,0]},
- "Saudi Arabia|Uruguay":{h:"Saudi Arabia",s:[1,1]},
- // Group I (decider France–Norway & Senegal–Iraq pending)
- "France|Senegal":{h:"France",s:[3,1]},
- "Iraq|Norway":{h:"Norway",s:[4,1]},
- "Norway|Senegal":{h:"Norway",s:[3,2]},
- "France|Iraq":{h:"France",s:[3,0]},
+ "Japan|Netherlands":{h:"Netherlands",s:[2,2],date:"Jun 14",venue:"AT&T Stadium, Arlington"},
+ "Sweden|Tunisia":{h:"Sweden",s:[5,1],date:"Jun 14",venue:"Estadio BBVA, Guadalupe"},
+ "Netherlands|Sweden":{h:"Netherlands",s:[5,1],date:"Jun 20",venue:"NRG Stadium, Houston"},
+ "Japan|Tunisia":{h:"Tunisia",s:[0,4],date:"Jun 20",venue:"Estadio BBVA, Guadalupe"},
+ "Japan|Sweden":{h:"Japan",s:[1,1],date:"Jun 25",venue:"AT&T Stadium, Arlington"},
+ "Netherlands|Tunisia":{h:"Tunisia",s:[1,3],date:"Jun 25",venue:"Arrowhead Stadium, Kansas City"},
+ // Group G
+ "Belgium|Egypt":{h:"Belgium",s:[1,1],date:"Jun 15",venue:"Lumen Field, Seattle"},
+ "Iran|New Zealand":{h:"Iran",s:[2,2],date:"Jun 15",venue:"SoFi Stadium, Inglewood"},
+ "Belgium|Iran":{h:"Belgium",s:[0,0],date:"Jun 21",venue:"SoFi Stadium, Inglewood"},
+ "Egypt|New Zealand":{h:"New Zealand",s:[1,3],date:"Jun 21",venue:"BC Place, Vancouver"},
+ "Egypt|Iran":{date:"Jun 26",venue:"Lumen Field, Seattle",time:"9:00 PM CST"},
+ "Belgium|New Zealand":{date:"Jun 26",venue:"BC Place, Vancouver",time:"9:00 PM CST"},
+ // Group H
+ "Cape Verde|Spain":{h:"Spain",s:[0,0],date:"Jun 15",venue:"Mercedes-Benz Stadium, Atlanta"},
+ "Saudi Arabia|Uruguay":{h:"Saudi Arabia",s:[1,1],date:"Jun 15",venue:"Hard Rock Stadium, Miami Gardens"},
+ "Saudi Arabia|Spain":{h:"Spain",s:[4,0],date:"Jun 21",venue:"Mercedes-Benz Stadium, Atlanta"},
+ "Cape Verde|Uruguay":{h:"Uruguay",s:[2,2],date:"Jun 21",venue:"Hard Rock Stadium, Miami Gardens"},
+ "Cape Verde|Saudi Arabia":{date:"Jun 26",venue:"NRG Stadium, Houston"},
+ "Spain|Uruguay":{date:"Jun 26",venue:"Estadio Akron, Guadalajara"},
+ // Group I (complete)
+ "France|Senegal":{h:"France",s:[3,1],date:"Jun 16",venue:"MetLife Stadium, East Rutherford"},
+ "Iraq|Norway":{h:"Iraq",s:[1,4],date:"Jun 16",venue:"Gillette Stadium, Foxborough"},
+ "France|Iraq":{h:"France",s:[3,0],date:"Jun 22",venue:"Lincoln Financial Field, Philadelphia"},
+ "Norway|Senegal":{h:"Norway",s:[3,2],date:"Jun 22",venue:"MetLife Stadium, East Rutherford"},
+ "France|Norway":{h:"Norway",s:[1,4],date:"Jun 26",venue:"Gillette Stadium, Foxborough"},
+ "Iraq|Senegal":{h:"Senegal",s:[5,0],date:"Jun 26",venue:"BMO Field, Toronto"},
  // Group J
- "Algeria|Argentina":{h:"Argentina",s:[3,0]},
- "Austria|Jordan":{h:"Austria",s:[3,1]},
- "Argentina|Austria":{h:"Argentina",s:[2,0]},
- "Algeria|Jordan":{h:"Algeria",s:[2,1]},
+ "Algeria|Argentina":{h:"Argentina",s:[3,0],date:"Jun 16",venue:"Arrowhead Stadium, Kansas City"},
+ "Austria|Jordan":{h:"Austria",s:[3,1],date:"Jun 16",venue:"Levi's Stadium, Santa Clara"},
+ "Argentina|Austria":{h:"Argentina",s:[2,0],date:"Jun 22",venue:"AT&T Stadium, Arlington"},
+ "Algeria|Jordan":{h:"Jordan",s:[1,2],date:"Jun 22",venue:"Levi's Stadium, Santa Clara"},
+ "Algeria|Austria":{date:"Jun 27",venue:"Arrowhead Stadium, Kansas City",time:"8:00 PM CST"},
+ "Argentina|Jordan":{date:"Jun 27",venue:"AT&T Stadium, Arlington",time:"8:00 PM CST"},
  // Group K
- "DR Congo|Portugal":{h:"Portugal",s:[1,1]},
- "Colombia|Uzbekistan":{h:"Colombia",s:[3,1]},
- "Portugal|Uzbekistan":{h:"Portugal",s:[5,0]},
- "Colombia|DR Congo":{h:"Colombia",s:[1,0]},
- // Group L (matchday 3 on 27 Jun still to play)
- "Croatia|England":{h:"England",s:[4,2]},
- "Ghana|Panama":{h:"Ghana",s:[1,0]},
- "England|Ghana":{h:"England",s:[0,0]},
- "Croatia|Panama":{h:"Croatia",s:[1,0]}
+ "DR Congo|Portugal":{h:"Portugal",s:[1,1],date:"Jun 17",venue:"NRG Stadium, Houston"},
+ "Colombia|Uzbekistan":{h:"Uzbekistan",s:[1,3],date:"Jun 17",venue:"Estadio Banorte, Mexico City"},
+ "Portugal|Uzbekistan":{h:"Portugal",s:[5,0],date:"Jun 23",venue:"NRG Stadium, Houston"},
+ "Colombia|DR Congo":{h:"Colombia",s:[1,0],date:"Jun 23",venue:"Estadio Akron, Guadalajara"},
+ "Colombia|Portugal":{date:"Jun 27",venue:"Hard Rock Stadium, Miami Gardens",time:"5:30 PM CST"},
+ "DR Congo|Uzbekistan":{date:"Jun 27",venue:"Mercedes-Benz Stadium, Atlanta",time:"5:30 PM CST"},
+ // Group L
+ "Croatia|England":{h:"England",s:[4,2],date:"Jun 17",venue:"AT&T Stadium, Arlington"},
+ "Ghana|Panama":{h:"Ghana",s:[1,0],date:"Jun 17",venue:"BMO Field, Toronto"},
+ "England|Ghana":{h:"England",s:[0,0],date:"Jun 23",venue:"Gillette Stadium, Foxborough"},
+ "Croatia|Panama":{h:"Panama",s:[0,1],date:"Jun 23",venue:"BMO Field, Toronto"},
+ "Croatia|Ghana":{date:"Jun 27",venue:"Lincoln Financial Field, Philadelphia",time:"3:00 PM CST"},
+ "England|Panama":{date:"Jun 27",venue:"MetLife Stadium, East Rutherford",time:"3:00 PM CST"}
 };
 function matchKey(a,b){ return [a,b].slice().sort().join("|"); }
 
@@ -976,15 +987,24 @@ function mc(a,b,sa,sb,stage){
     +`<span class="t r"><span class="nm">${b?tname(b):"—"}</span>${sb?`<span class="seed">${sb}</span>`:""}<span class="flag">${FLAG[b]||"🏳️"}</span></span>`
     +`</div>`;
 }
-// All fixtures: 6 per group (round-robin) + the Round-of-32 knockout ties.
+function dateSortKey(d){ if(!d) return 99999; const p=d.split(" "); const m={Jun:6,Jul:7}[p[0]]||9; return m*100+(parseInt(p[1],10)||0); }
+// All 72 group fixtures, grouped under date headers in chronological order, then the knockout ties.
 function renderMatchList(){
-  let html=`<h2 class="sec">${t('m_groupstage')}</h2>`;
+  const all=[];
   LETTERS.forEach(L=>{
-    const ts=GROUPS[L], stage=`${t('group')} ${L}`;
-    html+=`<div class="mgrp">${stage}</div><div class="cardgrid">`;
-    for(let i=0;i<ts.length;i++) for(let j=i+1;j<ts.length;j++) html+=mc(ts[i],ts[j],"","",stage);
-    html+=`</div>`;
+    const ts=GROUPS[L];
+    for(let i=0;i<ts.length;i++) for(let j=i+1;j<ts.length;j++){
+      const a=ts[i], b=ts[j], info=MATCH_INFO[matchKey(a,b)];
+      all.push({a,b,L,date:info&&info.date?info.date:null});
+    }
   });
+  all.sort((x,y)=> dateSortKey(x.date)-dateSortKey(y.date));
+  let html=`<h2 class="sec">${t('m_groupstage')}</h2>`, cur=null;
+  all.forEach(m=>{
+    if(m.date!==cur){ if(cur!==null) html+=`</div>`; cur=m.date; html+=`<div class="mgrp">${m.date||t('m_tbd')}</div><div class="cardgrid">`; }
+    html+=mc(m.a,m.b,"","",`${t('group')} ${m.L}`);
+  });
+  if(cur!==null) html+=`</div>`;
   let ko="";
   if(bracketReady()){ for(let i=0;i<16;i++){ const [a,b]=matchTeams(0,i); ko+=mc(a,b,seedLabel(R32[i][0]),seedLabel(R32[i][1]),t('m_knockout')); } }
   html+=`<h2 class="sec">${t('m_knockout')}</h2><div class="cardgrid">${ko}</div>`;
@@ -1002,8 +1022,9 @@ function openMatchPopover(card){
   let score=`<span class="mpop-score">${t('vs')}</span>`;
   if(info&&info.s){ const home=info.h===a; const ga=home?info.s[0]:info.s[1], gb=home?info.s[1]:info.s[0];
     score=`<span class="mpop-score">${ga} - ${gb}</span>`; }
-  const info2 = (info&&info.date) ? `📅 ${info.date}<br>📍 ${info.venue}<br>🕐 ${info.time}`
-                                  : `${t('m_sched')} ${officialLink()}`;
+  let info2;
+  if(info&&info.date){ info2=`📅 ${info.date}`+(info.venue?`<br>📍 ${info.venue}`:``)+(info.time?`<br>🕐 ${info.time}`:``); }
+  else { info2=`${t('m_sched')} ${officialLink()}`; }
   const pa=REAL_POINTS[a]!=null?`<span class="mpop-pts">${REAL_POINTS[a]} ${t('pt_abbr')}</span>`:"";
   const pb=REAL_POINTS[b]!=null?`<span class="mpop-pts">${REAL_POINTS[b]} ${t('pt_abbr')}</span>`:"";
   const pop=getPopover();
