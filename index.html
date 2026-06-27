@@ -155,6 +155,22 @@
   .bracket-stage .lock{color:#fff;background:rgba(0,0,0,.20);border:1px dashed rgba(255,255,255,.55)}
   .bracket-stage .trophy{filter:drop-shadow(0 4px 10px rgba(0,0,0,.45))}
   .bracket-stage .champ.empty{background:rgba(255,255,255,.13);color:#eafff2;border:1px dashed rgba(255,255,255,.6)}
+  /* Standings tables (league-table style) */
+  .standings-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;margin-top:14px}
+  .sttable{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .sthead{font-weight:800;padding:10px 14px;border-bottom:1px solid var(--line);font-size:15px}
+  .provtag{font-size:10px;color:var(--yellow);font-weight:700;margin-left:6px}
+  .stt{width:100%;border-collapse:collapse;font-size:13px;table-layout:auto}
+  .stt th,.stt td{padding:7px 5px;text-align:center;white-space:nowrap}
+  .stt th{color:var(--muted);font-size:11px;font-weight:700;border-bottom:1px solid var(--line)}
+  .stt td.pos,.stt th.pos{width:20px;color:var(--muted)}
+  .stt td.team,.stt th.team{text-align:left;width:99%;overflow:hidden;text-overflow:ellipsis;padding-left:8px}
+  .stt td.team .flag{font-size:16px;margin-right:5px}
+  .stt td.ptsc,.stt th.ptsc{font-weight:800}
+  .stt tbody tr{border-bottom:1px solid var(--line)}
+  .stt tbody tr:last-child{border-bottom:none}
+  .stt tbody tr.adv{box-shadow:inset 3px 0 0 var(--green)}
+  .stt tbody tr.third{box-shadow:inset 3px 0 0 var(--yellow)}
   /* Tabs + views */
   .tabs{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:18px 0 6px}
   .tab{background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:22px;
@@ -262,7 +278,7 @@
 
   <section class="view" id="v-standings">
     <h2 class="sec" id="hGroupStage"></h2>
-    <div class="groups" id="groups"></div>
+    <div class="standings-grid" id="standingsHost"></div>
     <h2 class="sec" id="hThirds"></h2>
     <div id="thirds">
       <div class="note" id="thirdNote"></div>
@@ -543,9 +559,15 @@ Object.assign(STRINGS.es,{ m_groupstage:"Partidos de fase de grupos", m_knockout
 Object.assign(STRINGS.pt,{ m_groupstage:"Jogos da fase de grupos", m_knockout:"Mata-mata",
   m_alllater:"As fases seguintes dependem das suas escolhas — veja a aba {bracket}.",
   cr7_tag:"⭐ Nosso craque", cr7_note:"Primeiro a marcar em seis Copas do Mundo diferentes · maior artilheiro de Portugal em Copas (10 gols)." });
-Object.assign(STRINGS.en,{ m_sched:"Date, venue & kickoff:", m_tbd:"TBD" });
-Object.assign(STRINGS.es,{ m_sched:"Fecha, sede y hora:", m_tbd:"Por definir" });
-Object.assign(STRINGS.pt,{ m_sched:"Data, local e horário:", m_tbd:"A definir" });
+Object.assign(STRINGS.en,{ m_sched:"Date, venue & kickoff:", m_tbd:"TBD",
+  col_mp:"MP",col_w:"W",col_d:"D",col_l:"L",col_gf:"GF",col_ga:"GA",col_gd:"GD",col_pts:"Pts",
+  hint_standings:"live tables — top 2 advance (green), best 3rd-place in the mix (yellow)" });
+Object.assign(STRINGS.es,{ m_sched:"Fecha, sede y hora:", m_tbd:"Por definir",
+  col_mp:"PJ",col_w:"G",col_d:"E",col_l:"P",col_gf:"GF",col_ga:"GC",col_gd:"DG",col_pts:"Pts",
+  hint_standings:"tablas en vivo — los 2 primeros avanzan (verde), mejores terceros en juego (amarillo)" });
+Object.assign(STRINGS.pt,{ m_sched:"Data, local e horário:", m_tbd:"A definir",
+  col_mp:"J",col_w:"V",col_d:"E",col_l:"D",col_gf:"GP",col_ga:"GC",col_gd:"SG",col_pts:"Pts",
+  hint_standings:"tabelas ao vivo — os 2 primeiros avançam (verde), melhores terceiros em disputa (amarelo)" });
 // Real schedule + results from the official date-by-date fixtures (extracted 26 Jun 2026).
 // h = home team, s = [home goals, away goals] (omitted = not played yet). date/venue for every match; time (CST) where known.
 const MATCH_INFO = {
@@ -647,38 +669,45 @@ function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
 function team(name){ return {name, flag:FLAG[name]||"🏳️"}; }
 
 // ---------- GROUPS ----------
-function renderGroups(){
-  const host=document.getElementById("groups"); host.innerHTML="";
-  LETTERS.forEach(L=>{
-    const order = state.ranks[L]||[]; // array of team names in finishing order
-    const card=document.createElement("div"); card.className="gcard";
-    const h=document.createElement("h3");
-    h.innerHTML=`${t('group')} ${L}`+(PROVISIONAL.includes(L)?` <span style="font-size:10px;color:var(--yellow);font-weight:700">${t('provisional')}</span>`:``);
-    const rb=document.createElement("button"); rb.className="reset"; rb.textContent=t('reset');
-    rb.onclick=()=>{ delete state.ranks[L]; save(); renderAll(); };
-    h.appendChild(rb); card.appendChild(h);
-    GROUPS[L].forEach(name=>{
-      let rank = order.indexOf(name); // 0..2 explicit, -1 unranked
-      // auto 4th: if 3 ranked and this is the leftover
-      if(rank===-1 && order.length===3) rank=3;
-      const row=document.createElement("div");
-      row.className="team"+(rank>=0?" r"+(rank+1)+"border":"");
-      const badge = rank>=0 ? `<span class="badge r${rank+1}">${rank+1}</span>` : `<span class="badge" style="background:#0e1730;color:#5b6480">·</span>`;
-      const pts = REAL_POINTS[name]!=null ? `<span class="gpts">${REAL_POINTS[name]} ${t('pt_abbr')}</span>` : "";
-      row.innerHTML=`<span class="flag">${FLAG[name]||"🏳️"}</span><span class="nm">${tname(name)}</span>${pts}${badge}`;
-      row.onclick=()=>clickTeam(L,name);
-      card.appendChild(row);
-    });
-    host.appendChild(card);
-  });
+// Compute a real league table for one group from the match results (MATCH_INFO).
+function computeGroupTable(L){
+  const teams={}; GROUPS[L].forEach(tm=>teams[tm]={t:tm,mp:0,w:0,d:0,l:0,gf:0,ga:0,pts:0});
+  const ts=GROUPS[L];
+  for(let i=0;i<ts.length;i++) for(let j=i+1;j<ts.length;j++){
+    const info=MATCH_INFO[matchKey(ts[i],ts[j])];
+    if(!info || !info.s) continue;
+    const home=info.h, away=(home===ts[i]?ts[j]:ts[i]);
+    const hg=info.s[0], ag=info.s[1], H=teams[home], A=teams[away];
+    H.mp++; A.mp++; H.gf+=hg; H.ga+=ag; A.gf+=ag; A.ga+=hg;
+    if(hg>ag){ H.w++; H.pts+=3; A.l++; }
+    else if(hg<ag){ A.w++; A.pts+=3; H.l++; }
+    else { H.d++; A.d++; H.pts++; A.pts++; }
+  }
+  const arr=Object.values(teams);
+  arr.forEach(o=>o.gd=o.gf-o.ga);
+  arr.sort((a,b)=> b.pts-a.pts || b.gd-a.gd || b.gf-a.gf || (a.t<b.t?-1:1));
+  return arr;
 }
-function clickTeam(L,name){
-  let order=(state.ranks[L]||[]).slice();
-  if(order.includes(name)){ order.splice(order.indexOf(name),1); } // un-rank
-  else if(order.length<3){ order.push(name); }
-  else { return; } // 3 chosen -> 4th is automatic, ignore clicks
-  state.ranks[L]=order;
-  save(); renderAll();
+// Standings tab: a league table per group (MP W D L GF GA GD Pts), top 2 green, 3rd yellow.
+function renderStandings(){
+  let html="";
+  LETTERS.forEach(L=>{
+    const rows=computeGroupTable(L);
+    const prov=PROVISIONAL.includes(L)?` <span class="provtag">${t('provisional')}</span>`:``;
+    html+=`<div class="sttable"><div class="sthead">${t('group')} ${L}${prov}</div>`
+      +`<table class="stt"><thead><tr><th class="pos"></th><th class="team"></th>`
+      +`<th>${t('col_mp')}</th><th>${t('col_w')}</th><th>${t('col_d')}</th><th>${t('col_l')}</th>`
+      +`<th>${t('col_gf')}</th><th>${t('col_ga')}</th><th>${t('col_gd')}</th><th class="ptsc">${t('col_pts')}</th></tr></thead><tbody>`;
+    rows.forEach((o,i)=>{
+      const cls=i<2?"adv":(i===2?"third":"");
+      html+=`<tr class="${cls}"><td class="pos">${i+1}</td>`
+        +`<td class="team"><span class="flag">${FLAG[o.t]||"🏳️"}</span> ${tname(o.t)}</td>`
+        +`<td>${o.mp}</td><td>${o.w}</td><td>${o.d}</td><td>${o.l}</td>`
+        +`<td>${o.gf}</td><td>${o.ga}</td><td>${o.gd>0?"+":""}${o.gd}</td><td class="ptsc">${o.pts}</td></tr>`;
+    });
+    html+=`</tbody></table></div>`;
+  });
+  document.getElementById("standingsHost").innerHTML=html;
 }
 function groupDone(L){ return (state.ranks[L]||[]).length===3; }
 function allGroupsDone(){ return LETTERS.every(groupDone); }
@@ -893,10 +922,12 @@ function clearAll(){
   state={ranks:{},thirds:[],picks:{}}; save(); renderAll();
 }
 function useRealResults(){
-  // Fill each group with the real current standings (top 3; 4th is automatic).
+  // Re-apply the bundled results to the bracket, AND reload the page bypassing the
+  // browser cache so the newest published version (if any) is fetched. Picks are kept.
   LETTERS.forEach(L=>{ state.ranks[L] = REAL_RESULTS[L].slice(0,3); });
   state.realVersion = REAL_RESULTS_VERSION;
-  save(); renderAll();
+  save();
+  location.href = location.pathname + "?t=" + Date.now();
 }
 
 // Theme
@@ -913,7 +944,7 @@ function applyLang(lang){
   document.getElementById("realBtn").textContent = t('btn_update');
   document.getElementById("clearBtn").textContent = t('btn_clear');
   document.querySelectorAll("[data-i18n]").forEach(el=> el.textContent = t(el.getAttribute("data-i18n")));
-  document.getElementById("hGroupStage").innerHTML = `${t('h_groupstage')} <span class="hint">${t('hint_groupstage')}</span>`;
+  document.getElementById("hGroupStage").innerHTML = `${t('h_groupstage')} <span class="hint">${t('hint_standings')}</span>`;
   document.getElementById("hThirds").innerHTML = `${t('h_thirds')} <span class="hint">${t('hint_thirds')}</span>`;
   document.getElementById("realNote").innerHTML = t('realnote',{date:REAL_RESULTS_DATE});
   document.getElementById("footer").innerHTML = `${t('footer1')}<br>${t('footer2',{date:REAL_RESULTS_DATE})}`;
@@ -1080,7 +1111,7 @@ function showView(name){
 
 function renderAll(){
   state.thirds = computeThirds().qualifiedLetters; // auto-qualified best 8
-  renderGroups(); renderThirds(); renderBracket();
+  renderStandings(); renderThirds(); renderBracket();
   renderOverview(); renderMatches(); renderStats(); renderPlayers();
 }
 
