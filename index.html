@@ -165,11 +165,30 @@
   .stt th,.stt td{padding:7px 5px;text-align:center;white-space:nowrap}
   .stt th{color:var(--muted);font-size:11px;font-weight:700;border-bottom:1px solid var(--line)}
   .stt td.pos,.stt th.pos{width:20px;color:var(--muted)}
-  .stt td.ordc,.stt th.ordh{width:18px;padding:0 2px}
-  .ord{display:block;width:16px;height:11px;line-height:10px;font-size:9px;background:none;border:none;
-    color:var(--muted);cursor:pointer;padding:0;margin:0 auto}
-  .ord:hover{color:var(--gold)}
-  .ord.off{opacity:.2;cursor:default}
+  /* Simulate tab — simple click-to-rank group cards */
+  .simbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:10px;flex-wrap:wrap}
+  .simprog{color:var(--muted);font-size:14px;font-weight:700}
+  .simgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin-top:8px}
+  .simcard{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+  .simchead{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:15px;margin-bottom:6px}
+  .simchead .clr{font-size:11px;color:var(--muted);background:none;border:none;cursor:pointer}
+  .simchead .clr:hover{color:var(--gold)}
+  .simteam{display:flex;align-items:center;gap:9px;padding:8px 9px;margin:5px 0;border-radius:9px;
+    background:var(--panel2);border:1px solid transparent;cursor:pointer;font-size:14px;user-select:none}
+  .simteam:hover{border-color:var(--gold)}
+  .simteam .spos{width:16px;text-align:center;font-weight:800;font-size:13px;color:var(--muted)}
+  .simteam .flag{font-size:18px}
+  .simteam .sname{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .simteam .sadv{font-size:10px;font-weight:800;padding:2px 8px;border-radius:10px;flex:0 0 auto}
+  .simteam.p1,.simteam.p2{border-color:var(--green)}
+  .simteam.p1 .sadv,.simteam.p2 .sadv{background:var(--green);color:#06301a}
+  .simteam.p1 .spos,.simteam.p2 .spos{color:var(--green)}
+  .simteam.p3{border-color:var(--yellow)}
+  .simteam.p3 .sadv{background:var(--yellow);color:#3d2f00}
+  .simteam.p3 .spos{color:var(--yellow)}
+  .simteam.p4{opacity:.55}
+  .simteam.p4 .sadv{background:var(--gray);color:#fff}
+  .simteam.un{opacity:.8;border-style:dashed;border-color:var(--line)}
   .stt td.tcol,.stt th.tcol{text-align:left;width:99%;overflow:hidden;text-overflow:ellipsis;padding-left:8px}
   .stt td.tcol .flag{font-size:16px;margin-right:5px}
   .stt td.ptsc,.stt th.ptsc{font-weight:800}
@@ -285,16 +304,16 @@
   <section class="view" id="v-standings">
     <h2 class="sec" id="hGroupStage"></h2>
     <div class="standings-grid" id="standingsHost"></div>
+  </section>
+
+  <section class="view" id="v-bracket">
+    <h2 class="sec" id="hSimGroups"></h2>
+    <div id="simGroupsHost"></div>
     <h2 class="sec" id="hThirds"></h2>
     <div id="thirds">
       <div class="note" id="thirdNote"></div>
       <div class="thirdsgrid" id="thirdsGrid"></div>
     </div>
-  </section>
-
-  <section class="view" id="v-bracket">
-    <h2 class="sec" id="hSimGroups"></h2>
-    <div class="standings-grid" id="simGroupsHost"></div>
     <h2 class="sec" id="hSimBracket"></h2>
     <div id="bracketHost"></div>
   </section>
@@ -560,15 +579,18 @@ Object.assign(STRINGS.pt,{ m_groupstage:"Jogos da fase de grupos", m_knockout:"M
 Object.assign(STRINGS.en,{ m_sched:"Date, venue & kickoff:", m_tbd:"TBD",
   col_mp:"MP",col_w:"W",col_d:"D",col_l:"L",col_gf:"GF",col_ga:"GA",col_gd:"GD",col_pts:"Pts",
   hint_standings:"live tables — top 2 advance (green), 3rd-place in the mix (yellow)",
-  hint_sim:"use ▲▼ to set each group, then play the bracket below — or hit Update results for the real ones" });
+  hint_sim:"tap teams to rank each group (1st→4th) · top 2 + best 3rds advance — or hit Update results for the real ones",
+  sim_progress:"Groups ranked: {n}/12", sim_shuffle:"Shuffle", sim_clear:"clear", adv_adv:"Advances", adv_3:"3rd place", adv_out:"Out" });
 Object.assign(STRINGS.es,{ m_sched:"Fecha, sede y hora:", m_tbd:"Por definir",
   col_mp:"PJ",col_w:"G",col_d:"E",col_l:"P",col_gf:"GF",col_ga:"GC",col_gd:"DG",col_pts:"Pts",
   hint_standings:"tablas en vivo — los 2 primeros avanzan (verde), 3.º en juego (amarillo)",
-  hint_sim:"usa ▲▼ para definir cada grupo y juega la llave abajo — o pulsa Actualizar resultados para los reales" });
+  hint_sim:"toca los equipos para ordenar cada grupo (1.º→4.º) · avanzan los 2 primeros + mejores terceros — o pulsa Actualizar resultados",
+  sim_progress:"Grupos definidos: {n}/12", sim_shuffle:"Aleatorio", sim_clear:"borrar", adv_adv:"Avanza", adv_3:"3.º", adv_out:"Fuera" });
 Object.assign(STRINGS.pt,{ m_sched:"Data, local e horário:", m_tbd:"A definir",
   col_mp:"J",col_w:"V",col_d:"E",col_l:"D",col_gf:"GP",col_ga:"GC",col_gd:"SG",col_pts:"Pts",
   hint_standings:"tabelas ao vivo — os 2 primeiros avançam (verde), 3º em disputa (amarelo)",
-  hint_sim:"use ▲▼ para definir cada grupo e jogue o chaveamento abaixo — ou toque em Atualizar resultados para os reais" });
+  hint_sim:"toque nos times para ordenar cada grupo (1º→4º) · avançam os 2 primeiros + melhores terceiros — ou toque em Atualizar resultados",
+  sim_progress:"Grupos definidos: {n}/12", sim_shuffle:"Sortear", sim_clear:"limpar", adv_adv:"Avança", adv_3:"3º", adv_out:"Fora" });
 // Real schedule + results from the official date-by-date fixtures (extracted 26 Jun 2026).
 // h = home team, s = [home goals, away goals] (omitted = not played yet). date/venue for every match; time (CST) where known.
 const MATCH_INFO = {
@@ -687,45 +709,21 @@ function groupStats(L){
   Object.values(teams).forEach(o=>o.gd=o.gf-o.ga);
   return teams;
 }
-// The finishing order used by the bracket: the 3 ranked teams + the leftover as 4th.
-function fullOrder(L){
-  const ranks=(state.ranks[L]||[]).slice(0,3);
-  const rest=GROUPS[L].filter(tm=>!ranks.includes(tm));
-  return ranks.concat(rest);
-}
-// Move a team up/down in a group's finishing order (the simulator). Updates the bracket.
-function moveTeam(L,idx,dir){
-  const order=fullOrder(L); const j=idx+dir;
-  if(j<0 || j>=order.length) return;
-  const tmp=order[idx]; order[idx]=order[j]; order[j]=tmp;
-  state.ranks[L]=order.slice(0,3);
-  state.thirds=computeThirds().qualifiedLetters;
-  if(bracketReady()) autoPlayBracket(true);   // keep the bracket complete, preserving valid picks
-  save();
-  const y=window.scrollY; renderAll(); window.scrollTo(0,y);
-}
-// Render a league table per group into hostId. editable=true adds ▲▼ reorder controls (Simulate tab).
-function renderGroupTables(hostId, editable){
-  const host=document.getElementById(hostId); if(!host) return;
+// Standings tab: real league tables (sorted by points), read-only — not affected by simulation.
+function renderStandings(){
+  const host=document.getElementById("standingsHost"); if(!host) return;
   let html="";
   LETTERS.forEach(L=>{
-    const stats=groupStats(L), order=fullOrder(L);
+    const rows=Object.values(groupStats(L)).sort((a,b)=> b.pts-a.pts||b.gd-a.gd||b.gf-a.gf||(a.t<b.t?-1:1));
     const prov=PROVISIONAL.includes(L)?` <span class="provtag">${t('provisional')}</span>`:``;
     html+=`<div class="sttable"><div class="sthead">${t('group')} ${L}${prov}</div>`
-      +`<table class="stt"><thead><tr><th class="pos"></th>${editable?'<th class="ordh"></th>':''}<th class="tcol"></th>`
+      +`<table class="stt"><thead><tr><th class="pos"></th><th class="tcol"></th>`
       +`<th>${t('col_mp')}</th><th>${t('col_w')}</th><th>${t('col_d')}</th><th>${t('col_l')}</th>`
       +`<th>${t('col_gf')}</th><th>${t('col_ga')}</th><th>${t('col_gd')}</th><th class="ptsc">${t('col_pts')}</th></tr></thead><tbody>`;
-    order.forEach((tm,i)=>{
-      const o=stats[tm];
+    rows.forEach((o,i)=>{
       const cls=i<2?"adv":(i===2?"p3":"");
-      let ordcell="";
-      if(editable){
-        const up = i>0 ? `<button class="ord" onclick="moveTeam('${L}',${i},-1)">▲</button>` : `<span class="ord off">▲</span>`;
-        const dn = i<order.length-1 ? `<button class="ord" onclick="moveTeam('${L}',${i},1)">▼</button>` : `<span class="ord off">▼</span>`;
-        ordcell=`<td class="ordc">${up}${dn}</td>`;
-      }
-      html+=`<tr class="${cls}"><td class="pos">${i+1}</td>${ordcell}`
-        +`<td class="tcol"><span class="flag">${FLAG[tm]||"🏳️"}</span> ${tname(tm)}</td>`
+      html+=`<tr class="${cls}"><td class="pos">${i+1}</td>`
+        +`<td class="tcol"><span class="flag">${FLAG[o.t]||"🏳️"}</span> ${tname(o.t)}</td>`
         +`<td>${o.mp}</td><td>${o.w}</td><td>${o.d}</td><td>${o.l}</td>`
         +`<td>${o.gf}</td><td>${o.ga}</td><td>${o.gd>0?"+":""}${o.gd}</td><td class="ptsc">${o.pts}</td></tr>`;
     });
@@ -733,8 +731,51 @@ function renderGroupTables(hostId, editable){
   });
   host.innerHTML=html;
 }
-function renderStandings(){ renderGroupTables("standingsHost", false); }  // Standings tab: read-only
-function renderSimGroups(){ renderGroupTables("simGroupsHost", true); }   // Simulate tab: editable
+// Simulate tab: simple click-to-rank group cards (no stats). Tap teams 1st→4th.
+function renderSimGroups(){
+  const host=document.getElementById("simGroupsHost"); if(!host) return;
+  const done=LETTERS.filter(groupDone).length;
+  let html=`<div class="simbar"><span class="simprog">${t('sim_progress',{n:done})}</span>`
+    +`<button class="act" onclick="shuffleGroups()">🎲 ${t('sim_shuffle')}</button></div><div class="simgrid">`;
+  LETTERS.forEach(L=>{
+    const ranks=(state.ranks[L]||[]).slice(0,3);
+    const order=ranks.concat(GROUPS[L].filter(tm=>!ranks.includes(tm)));
+    html+=`<div class="simcard"><div class="simchead"><span>${t('group')} ${L}</span>`
+      +`<button class="clr" onclick="clearGroup('${L}')">${t('sim_clear')}</button></div>`;
+    order.forEach((tm,i)=>{
+      const ranked = i<ranks.length || ranks.length===3;  // definite position (4th auto when 3 ranked)
+      const pos=i+1;
+      let cls="un", adv="", posTxt="·";
+      if(ranked){ posTxt=String(pos); cls="p"+pos; adv = pos<=2?t('adv_adv'):(pos===3?t('adv_3'):t('adv_out')); }
+      html+=`<div class="simteam ${cls}" onclick="clickTeam('${L}','${tm}')">`
+        +`<span class="spos">${posTxt}</span><span class="flag">${FLAG[tm]||"🏳️"}</span>`
+        +`<span class="sname">${tname(tm)}</span>`
+        +(adv?`<span class="sadv">${adv}</span>`:``)+`</div>`;
+    });
+    html+=`</div>`;
+  });
+  host.innerHTML=html+`</div>`;
+}
+function clickTeam(L,name){
+  let order=(state.ranks[L]||[]).slice(0,3);
+  if(order.includes(name)) order.splice(order.indexOf(name),1);   // un-rank
+  else if(order.length<3) order.push(name);                       // assign next rank (4th is automatic)
+  else return;
+  state.ranks[L]=order; afterSimChange();
+}
+function clearGroup(L){ state.ranks[L]=[]; afterSimChange(); }
+function shuffleGroups(){
+  LETTERS.forEach(L=>{ const a=GROUPS[L].slice();
+    for(let k=a.length-1;k>0;k--){ const j=(Math.random()*(k+1))|0; const tmp=a[k]; a[k]=a[j]; a[j]=tmp; }
+    state.ranks[L]=a.slice(0,3); });
+  afterSimChange();
+}
+function afterSimChange(){
+  state.thirds=computeThirds().qualifiedLetters;
+  if(bracketReady()) autoPlayBracket(true);    // keep the bracket complete, preserving valid picks
+  save();
+  const y=window.scrollY; renderAll(); window.scrollTo(0,y);
+}
 function groupDone(L){ return (state.ranks[L]||[]).length===3; }
 function allGroupsDone(){ return LETTERS.every(groupDone); }
 function placed(L,pos){ // pos 0=winner,1=runner,2=third
