@@ -445,6 +445,9 @@ const ALL_SCORERS = [
  {n:"Nicolas Pépé",c:"Ivory Coast",g:2},{n:"Anthony Elanga",c:"Sweden",g:2},
  {n:"Pape Gueye",c:"Senegal",g:2},{n:"Iliman Ndiaye",c:"Senegal",g:2}
 ];
+// Keep goal tiers descending, but float Cristiano Ronaldo to the top of his tier (stable sort).
+ALL_SCORERS.sort((a,b)=> b.g-a.g
+  || (a.n==="Cristiano Ronaldo"?-1 : b.n==="Cristiano Ronaldo"?1 : 0));
 const SCORERS_PER_PAGE = 10;
 let scorerPage = 0;
 const TOURNAMENT = {
