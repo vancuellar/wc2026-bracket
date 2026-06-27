@@ -164,13 +164,13 @@
   .stt th,.stt td{padding:7px 5px;text-align:center;white-space:nowrap}
   .stt th{color:var(--muted);font-size:11px;font-weight:700;border-bottom:1px solid var(--line)}
   .stt td.pos,.stt th.pos{width:20px;color:var(--muted)}
-  .stt td.team,.stt th.team{text-align:left;width:99%;overflow:hidden;text-overflow:ellipsis;padding-left:8px}
-  .stt td.team .flag{font-size:16px;margin-right:5px}
+  .stt td.tcol,.stt th.tcol{text-align:left;width:99%;overflow:hidden;text-overflow:ellipsis;padding-left:8px}
+  .stt td.tcol .flag{font-size:16px;margin-right:5px}
   .stt td.ptsc,.stt th.ptsc{font-weight:800}
   .stt tbody tr{border-bottom:1px solid var(--line)}
   .stt tbody tr:last-child{border-bottom:none}
   .stt tbody tr.adv{box-shadow:inset 3px 0 0 var(--green)}
-  .stt tbody tr.third{box-shadow:inset 3px 0 0 var(--yellow)}
+  .stt tbody tr.p3{box-shadow:inset 3px 0 0 var(--yellow)}
   /* Tabs + views */
   .tabs{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:18px 0 6px}
   .tab{background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:22px;
@@ -695,13 +695,13 @@ function renderStandings(){
     const rows=computeGroupTable(L);
     const prov=PROVISIONAL.includes(L)?` <span class="provtag">${t('provisional')}</span>`:``;
     html+=`<div class="sttable"><div class="sthead">${t('group')} ${L}${prov}</div>`
-      +`<table class="stt"><thead><tr><th class="pos"></th><th class="team"></th>`
+      +`<table class="stt"><thead><tr><th class="pos"></th><th class="tcol"></th>`
       +`<th>${t('col_mp')}</th><th>${t('col_w')}</th><th>${t('col_d')}</th><th>${t('col_l')}</th>`
       +`<th>${t('col_gf')}</th><th>${t('col_ga')}</th><th>${t('col_gd')}</th><th class="ptsc">${t('col_pts')}</th></tr></thead><tbody>`;
     rows.forEach((o,i)=>{
-      const cls=i<2?"adv":(i===2?"third":"");
+      const cls=i<2?"adv":(i===2?"p3":"");
       html+=`<tr class="${cls}"><td class="pos">${i+1}</td>`
-        +`<td class="team"><span class="flag">${FLAG[o.t]||"🏳️"}</span> ${tname(o.t)}</td>`
+        +`<td class="tcol"><span class="flag">${FLAG[o.t]||"🏳️"}</span> ${tname(o.t)}</td>`
         +`<td>${o.mp}</td><td>${o.w}</td><td>${o.d}</td><td>${o.l}</td>`
         +`<td>${o.gf}</td><td>${o.ga}</td><td>${o.gd>0?"+":""}${o.gd}</td><td class="ptsc">${o.pts}</td></tr>`;
     });
