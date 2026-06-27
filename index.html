@@ -385,11 +385,11 @@ const REAL_RESULTS = {
  I:["France","Norway","Senegal","Iraq"],
  J:["Argentina","Austria","Algeria","Jordan"],
  K:["Colombia","Portugal","DR Congo","Uzbekistan"],
- L:["England","Ghana","Croatia","Panama"]
+ L:["England","Croatia","Ghana","Panama"]
 };
-const PROVISIONAL = ["J","K","L"];
+const PROVISIONAL = ["J","K"];
 const REAL_RESULTS_DATE = "27 Jun 2026";    // when the stored real results were last refreshed
-const REAL_RESULTS_VERSION = "2026-06-27";  // bump this when results change → auto-applies on next open
+const REAL_RESULTS_VERSION = "2026-06-27b";  // bump this when results change → auto-applies on next open
 
 // Real group-stage points per team (official standings, 26 Jun 2026).
 const REAL_POINTS = {
@@ -404,7 +404,7 @@ const REAL_POINTS = {
  "France":9,"Norway":6,"Senegal":3,"Iraq":0,
  "Argentina":6,"Austria":3,"Algeria":3,"Jordan":0,
  "Colombia":6,"Portugal":4,"DR Congo":1,"Uzbekistan":0,
- "England":4,"Ghana":4,"Croatia":3,"Panama":0
+ "England":7,"Ghana":4,"Croatia":6,"Panama":0
 };
 // adidas Golden Boot race — every reported scorer so far (real, 26 Jun 2026).
 const ALL_SCORERS = [
@@ -654,8 +654,8 @@ const MATCH_INFO = {
  "Ghana|Panama":{h:"Ghana",s:[1,0],date:"Jun 17",venue:"BMO Field, Toronto"},
  "England|Ghana":{h:"England",s:[0,0],date:"Jun 23",venue:"Gillette Stadium, Foxborough"},
  "Croatia|Panama":{h:"Panama",s:[0,1],date:"Jun 23",venue:"BMO Field, Toronto"},
- "Croatia|Ghana":{date:"Jun 27",venue:"Lincoln Financial Field, Philadelphia",time:"3:00 PM CST"},
- "England|Panama":{date:"Jun 27",venue:"MetLife Stadium, East Rutherford",time:"3:00 PM CST"}
+ "Croatia|Ghana":{h:"Croatia",s:[2,1],date:"Jun 27",venue:"Lincoln Financial Field, Philadelphia"},
+ "England|Panama":{h:"Panama",s:[0,2],date:"Jun 27",venue:"MetLife Stadium, East Rutherford"}
 };
 function matchKey(a,b){ return [a,b].slice().sort().join("|"); }
 
