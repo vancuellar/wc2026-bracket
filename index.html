@@ -371,16 +371,16 @@ const REAL_RESULTS = {
  D:["United States","Australia","Paraguay","Turkey"],
  E:["Germany","Ivory Coast","Ecuador","Curaçao"],
  F:["Netherlands","Japan","Sweden","Tunisia"],
- G:["Egypt","Iran","Belgium","New Zealand"],
+ G:["Belgium","Egypt","Iran","New Zealand"],
  H:["Spain","Cape Verde","Uruguay","Saudi Arabia"],
  I:["France","Norway","Senegal","Iraq"],
  J:["Argentina","Austria","Algeria","Jordan"],
  K:["Colombia","Portugal","DR Congo","Uzbekistan"],
  L:["England","Ghana","Croatia","Panama"]
 };
-const PROVISIONAL = ["G","J","K","L"];
-const REAL_RESULTS_DATE = "26 Jun 2026";    // when the stored real results were last refreshed
-const REAL_RESULTS_VERSION = "2026-06-26b";  // bump this when results change → auto-applies on next open
+const PROVISIONAL = ["J","K","L"];
+const REAL_RESULTS_DATE = "27 Jun 2026";    // when the stored real results were last refreshed
+const REAL_RESULTS_VERSION = "2026-06-27";  // bump this when results change → auto-applies on next open
 
 // Real group-stage record for each third-placed team (points, goal diff, goals for).
 // Used to rank the 12 thirds and auto-qualify the best 8. Source: official standings, 26 Jun 2026.
@@ -389,7 +389,7 @@ const REAL_THIRD_STATS = {
  "Bosnia and Herzegovina":{p:4,gd:-1,gf:5}, "Paraguay":{p:4,gd:-2,gf:2},
  "Croatia":{p:3,gd:-1,gf:3}, "South Korea":{p:3,gd:-1,gf:2},
  "Algeria":{p:3,gd:-2,gf:2}, "Scotland":{p:3,gd:-3,gf:1},
- "Cape Verde":{p:2,gd:0,gf:2}, "Uruguay":{p:2,gd:-1,gf:3}, "Belgium":{p:2,gd:0,gf:1},
+ "Cape Verde":{p:2,gd:0,gf:2}, "Uruguay":{p:2,gd:-1,gf:3}, "Belgium":{p:2,gd:0,gf:1}, "Iran":{p:3,gd:0,gf:3},
  "DR Congo":{p:1,gd:-1,gf:1}, "Senegal":{p:3,gd:2,gf:8}
 };
 
@@ -401,7 +401,7 @@ const REAL_POINTS = {
  "United States":6,"Australia":4,"Paraguay":4,"Turkey":3,
  "Germany":6,"Ivory Coast":6,"Ecuador":4,"Curaçao":1,
  "Netherlands":7,"Japan":5,"Sweden":4,"Tunisia":0,
- "Egypt":4,"Iran":2,"Belgium":2,"New Zealand":1,
+ "Egypt":5,"Iran":3,"Belgium":5,"New Zealand":1,
  "Spain":7,"Uruguay":2,"Cape Verde":3,"Saudi Arabia":2,
  "France":9,"Norway":6,"Senegal":3,"Iraq":0,
  "Argentina":6,"Austria":3,"Algeria":3,"Jordan":0,
@@ -618,8 +618,8 @@ const MATCH_INFO = {
  "Iran|New Zealand":{h:"Iran",s:[2,2],date:"Jun 15",venue:"SoFi Stadium, Inglewood"},
  "Belgium|Iran":{h:"Belgium",s:[0,0],date:"Jun 21",venue:"SoFi Stadium, Inglewood"},
  "Egypt|New Zealand":{h:"New Zealand",s:[1,3],date:"Jun 21",venue:"BC Place, Vancouver"},
- "Egypt|Iran":{date:"Jun 26",venue:"Lumen Field, Seattle",time:"9:00 PM CST"},
- "Belgium|New Zealand":{date:"Jun 26",venue:"BC Place, Vancouver",time:"9:00 PM CST"},
+ "Egypt|Iran":{h:"Egypt",s:[1,1],date:"Jun 26",venue:"Lumen Field, Seattle"},
+ "Belgium|New Zealand":{h:"New Zealand",s:[1,5],date:"Jun 26",venue:"BC Place, Vancouver"},
  // Group H
  "Cape Verde|Spain":{h:"Spain",s:[0,0],date:"Jun 15",venue:"Mercedes-Benz Stadium, Atlanta"},
  "Saudi Arabia|Uruguay":{h:"Saudi Arabia",s:[1,1],date:"Jun 15",venue:"Hard Rock Stadium, Miami Gardens"},
