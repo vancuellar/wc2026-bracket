@@ -1011,12 +1011,20 @@ function grow(name,round,idx,winner,seed){
 // ---------- ACTIONS ----------
 function clearAll(){
   if(!confirm(t('clear_confirm'))) return;
-  state={ranks:{},thirds:[],picks:{}}; save(); renderAll();
+  // Keep the (real) groups so the bracket stays available, but empty the knockout picks
+  // so the user simulates it themselves. Do NOT auto-fill — only "Update results" does that.
+  LETTERS.forEach(L=> state.ranks[L]=REAL_RESULTS[L].slice(0,3));
+  state.thirds=computeThirds().qualifiedLetters;
+  state.picks={};
+  state.autoFilled=true;
+  state.realVersion=REAL_RESULTS_VERSION;
+  save(); renderAll();
 }
 function useRealResults(){
-  // Re-apply the bundled results to the bracket, AND reload the page bypassing the
-  // browser cache so the newest published version (if any) is fetched. Picks are kept.
+  // Apply the real groups, flag the bracket to auto-fill with the real result, then reload
+  // (cache-bust) to also fetch the newest published version.
   LETTERS.forEach(L=>{ state.ranks[L] = REAL_RESULTS[L].slice(0,3); });
+  state.fillReal = true;
   state.realVersion = REAL_RESULTS_VERSION;
   save();
   location.href = location.pathname + "?t=" + Date.now();
@@ -1229,10 +1237,13 @@ if(state.realVersion !== REAL_RESULTS_VERSION){
   save();
 }
 
-// Finish the bracket once on first open so it shows a full prediction (editable afterwards).
-if(!state.autoFilled && Object.keys(state.picks).length===0){
+// Bracket fill policy: only fill with the real result on the first-ever open, or right after
+// the user hits "Update results" (state.fillReal). Otherwise leave the bracket for the user
+// to simulate (e.g. after "Clear" the bracket is available but empty).
+if(state.fillReal || (!state.autoFilled && Object.keys(state.picks).length===0)){
   state.thirds = computeThirds().qualifiedLetters;
   if(bracketReady()) autoPlayBracket();
+  delete state.fillReal;
   state.autoFilled = true;
   save();
 }
