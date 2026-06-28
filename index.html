@@ -583,19 +583,19 @@ Object.assign(STRINGS.pt,{ m_groupstage:"Jogos da fase de grupos", m_knockout:"M
 Object.assign(STRINGS.en,{ m_sched:"Date, venue & kickoff:", m_tbd:"TBD",
   col_mp:"MP",col_w:"W",col_d:"D",col_l:"L",col_gf:"GF",col_ga:"GA",col_gd:"GD",col_pts:"Pts",
   hint_standings:"live tables — top 2 advance (green), 3rd-place in the mix (yellow)",
-  hint_sim:"tap teams to rank each group (1st→4th) · top 2 + best 3rds advance — or hit Update results for the real ones",
+  hint_sim:"tap a team to move it up (tap again to climb to 1st) · top 2 + best 3rds advance — or hit Update results for the real ones",
   sim_progress:"Groups ranked: {n}/12", sim_shuffle:"Shuffle", sim_clear:"clear", adv_adv:"Advances", adv_3:"3rd place", adv_out:"Out",
   clear_bracket:"↺ Clear bracket", clear_bracket_confirm:"Clear your bracket picks (keep the groups)?" });
 Object.assign(STRINGS.es,{ m_sched:"Fecha, sede y hora:", m_tbd:"Por definir",
   col_mp:"PJ",col_w:"G",col_d:"E",col_l:"P",col_gf:"GF",col_ga:"GC",col_gd:"DG",col_pts:"Pts",
   hint_standings:"tablas en vivo — los 2 primeros avanzan (verde), 3.º en juego (amarillo)",
-  hint_sim:"toca los equipos para ordenar cada grupo (1.º→4.º) · avanzan los 2 primeros + mejores terceros — o pulsa Actualizar resultados",
+  hint_sim:"toca un equipo para subirlo (toca otra vez para llegar al 1.º) · avanzan los 2 primeros + mejores terceros — o pulsa Actualizar resultados",
   sim_progress:"Grupos definidos: {n}/12", sim_shuffle:"Aleatorio", sim_clear:"borrar", adv_adv:"Avanza", adv_3:"3.º", adv_out:"Fuera",
   clear_bracket:"↺ Borrar llave", clear_bracket_confirm:"¿Borrar tus elecciones de la llave (mantener los grupos)?" });
 Object.assign(STRINGS.pt,{ m_sched:"Data, local e horário:", m_tbd:"A definir",
   col_mp:"J",col_w:"V",col_d:"E",col_l:"D",col_gf:"GP",col_ga:"GC",col_gd:"SG",col_pts:"Pts",
   hint_standings:"tabelas ao vivo — os 2 primeiros avançam (verde), 3º em disputa (amarelo)",
-  hint_sim:"toque nos times para ordenar cada grupo (1º→4º) · avançam os 2 primeiros + melhores terceiros — ou toque em Atualizar resultados",
+  hint_sim:"toque num time para subi-lo (toque de novo para chegar ao 1º) · avançam os 2 primeiros + melhores terceiros — ou toque em Atualizar resultados",
   sim_progress:"Grupos definidos: {n}/12", sim_shuffle:"Sortear", sim_clear:"limpar", adv_adv:"Avança", adv_3:"3º", adv_out:"Fora",
   clear_bracket:"↺ Limpar chaveamento", clear_bracket_confirm:"Limpar suas escolhas do chaveamento (manter os grupos)?" });
 // Real schedule + results from the official date-by-date fixtures (extracted 26 Jun 2026).
@@ -764,11 +764,15 @@ function renderSimGroups(){
   host.innerHTML=html+`</div>`;
 }
 function clickTeam(L,name){
-  let order=(state.ranks[L]||[]).slice(0,3);
-  if(order.includes(name)) order.splice(order.indexOf(name),1);   // un-rank
-  else if(order.length<3) order.push(name);                       // assign next rank (4th is automatic)
-  else return;
-  state.ranks[L]=order; afterSimChange();
+  // Build the full 4-team order, then move the tapped team UP one place.
+  // Works whether the group is pre-ranked (real results) or freshly cleared,
+  // so every tap visibly does something. Tap repeatedly to climb to 1st.
+  const ranks=(state.ranks[L]||[]).slice(0,3);
+  const order=ranks.concat(GROUPS[L].filter(tm=>!ranks.includes(tm)));
+  const i=order.indexOf(name);
+  if(i>0){ order.splice(i,1); order.splice(i-1,0,name); }   // promote one position
+  state.ranks[L]=order.slice(0,3);                          // 4th place is automatic
+  afterSimChange();
 }
 function clearGroup(L){ state.ranks[L]=[]; afterSimChange(); }
 function shuffleGroups(){
