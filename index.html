@@ -315,6 +315,7 @@
       <div class="thirdsgrid" id="thirdsGrid"></div>
     </div>
     <h2 class="sec" id="hSimBracket"></h2>
+    <div class="bar" style="justify-content:flex-start;margin:0 0 6px"><button class="act" id="clearBracketBtn"></button></div>
     <div id="bracketHost"></div>
   </section>
 
@@ -583,17 +584,20 @@ Object.assign(STRINGS.en,{ m_sched:"Date, venue & kickoff:", m_tbd:"TBD",
   col_mp:"MP",col_w:"W",col_d:"D",col_l:"L",col_gf:"GF",col_ga:"GA",col_gd:"GD",col_pts:"Pts",
   hint_standings:"live tables — top 2 advance (green), 3rd-place in the mix (yellow)",
   hint_sim:"tap teams to rank each group (1st→4th) · top 2 + best 3rds advance — or hit Update results for the real ones",
-  sim_progress:"Groups ranked: {n}/12", sim_shuffle:"Shuffle", sim_clear:"clear", adv_adv:"Advances", adv_3:"3rd place", adv_out:"Out" });
+  sim_progress:"Groups ranked: {n}/12", sim_shuffle:"Shuffle", sim_clear:"clear", adv_adv:"Advances", adv_3:"3rd place", adv_out:"Out",
+  clear_bracket:"↺ Clear bracket", clear_bracket_confirm:"Clear your bracket picks (keep the groups)?" });
 Object.assign(STRINGS.es,{ m_sched:"Fecha, sede y hora:", m_tbd:"Por definir",
   col_mp:"PJ",col_w:"G",col_d:"E",col_l:"P",col_gf:"GF",col_ga:"GC",col_gd:"DG",col_pts:"Pts",
   hint_standings:"tablas en vivo — los 2 primeros avanzan (verde), 3.º en juego (amarillo)",
   hint_sim:"toca los equipos para ordenar cada grupo (1.º→4.º) · avanzan los 2 primeros + mejores terceros — o pulsa Actualizar resultados",
-  sim_progress:"Grupos definidos: {n}/12", sim_shuffle:"Aleatorio", sim_clear:"borrar", adv_adv:"Avanza", adv_3:"3.º", adv_out:"Fuera" });
+  sim_progress:"Grupos definidos: {n}/12", sim_shuffle:"Aleatorio", sim_clear:"borrar", adv_adv:"Avanza", adv_3:"3.º", adv_out:"Fuera",
+  clear_bracket:"↺ Borrar llave", clear_bracket_confirm:"¿Borrar tus elecciones de la llave (mantener los grupos)?" });
 Object.assign(STRINGS.pt,{ m_sched:"Data, local e horário:", m_tbd:"A definir",
   col_mp:"J",col_w:"V",col_d:"E",col_l:"D",col_gf:"GP",col_ga:"GC",col_gd:"SG",col_pts:"Pts",
   hint_standings:"tabelas ao vivo — os 2 primeiros avançam (verde), 3º em disputa (amarelo)",
   hint_sim:"toque nos times para ordenar cada grupo (1º→4º) · avançam os 2 primeiros + melhores terceiros — ou toque em Atualizar resultados",
-  sim_progress:"Grupos definidos: {n}/12", sim_shuffle:"Sortear", sim_clear:"limpar", adv_adv:"Avança", adv_3:"3º", adv_out:"Fora" });
+  sim_progress:"Grupos definidos: {n}/12", sim_shuffle:"Sortear", sim_clear:"limpar", adv_adv:"Avança", adv_3:"3º", adv_out:"Fora",
+  clear_bracket:"↺ Limpar chaveamento", clear_bracket_confirm:"Limpar suas escolhas do chaveamento (manter os grupos)?" });
 // Real schedule + results from the official date-by-date fixtures (extracted 26 Jun 2026).
 // h = home team, s = [home goals, away goals] (omitted = not played yet). date/venue for every match; time (CST) where known.
 const MATCH_INFO = {
@@ -1020,6 +1024,14 @@ function clearAll(){
   state.realVersion=REAL_RESULTS_VERSION;
   save(); renderAll();
 }
+function clearBracket(){
+  // Clear only the knockout picks; keep the groups so the bracket stays available to simulate.
+  if(!confirm(t('clear_bracket_confirm'))) return;
+  state.picks={};
+  state.autoFilled=true;
+  save();
+  const y=window.scrollY; renderAll(); window.scrollTo(0,y);
+}
 function useRealResults(){
   // Apply the real groups, flag the bracket to auto-fill with the real result, then reload
   // (cache-bust) to also fetch the newest published version.
@@ -1043,6 +1055,7 @@ function applyLang(lang){
   document.getElementById("subtitle").textContent = t('subtitle');
   document.getElementById("realBtn").textContent = t('btn_update');
   document.getElementById("clearBtn").textContent = t('btn_clear');
+  document.getElementById("clearBracketBtn").textContent = t('clear_bracket');
   document.querySelectorAll("[data-i18n]").forEach(el=> el.textContent = t(el.getAttribute("data-i18n")));
   document.getElementById("hGroupStage").innerHTML = `${t('h_groupstage')} <span class="hint">${t('hint_standings')}</span>`;
   document.getElementById("hThirds").innerHTML = `${t('h_thirds')} <span class="hint">${t('hint_thirds')}</span>`;
@@ -1218,6 +1231,7 @@ function renderAll(){
 }
 
 document.getElementById("clearBtn").onclick=clearAll;
+document.getElementById("clearBracketBtn").onclick=clearBracket;
 document.getElementById("realBtn").onclick=useRealResults;
 document.getElementById("themeBtn").onclick=toggleTheme;
 document.getElementById("langSel").onchange=(e)=>applyLang(e.target.value);
