@@ -119,6 +119,11 @@
   .grow.win .seed{color:#dfeee4}
   .grow .flag{font-size:15px;width:18px;text-align:center;flex:0 0 auto}
   .grow .nm{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .grow .score{flex:0 0 auto;font-weight:800;font-size:13px;min-width:14px;text-align:right;color:var(--ink)}
+  .grow.win .score{color:#fff}
+  .grow .score .pen{font-size:9px;font-weight:700;opacity:.85;margin-left:1px}
+  .grow.locked{cursor:default}
+  .grow.locked:not(.win):hover{background:none}
   /* connectors: elbows merge each pair, stubs feed the next round */
   .left  .col-r16 .cell::after,.left  .col-oct .cell::after,.left  .col-cua .cell::after,
   .right .col-r16 .cell::after,.right .col-oct .cell::after,.right .col-cua .cell::after{
@@ -390,6 +395,11 @@ const THIRD_SLOT_ELIG = [
  ["E","F","G","I","J"], // S6  (M85)
  ["D","E","I","J","L"]  // S7  (M87)
 ];
+// Official FIFA allocation of the 8 best 3rd-placed teams to the slots S0..S7, for the
+// ACTUAL set of qualified groups (B,D,E,F,I,J,K,L). The generic heuristic in getMatching()
+// can pick a different valid matching, so when the real qualifiers are in play we use this
+// fixed table to match the real bracket exactly. Order is S0,S1,...,S7.
+const REAL_THIRD_SLOTS = ["D","F","B","I","E","K","J","L"];
 
 // Real group-stage standings (1st→4th), names match GROUPS exactly.
 // G, H, L are provisional (final matchday 27 Jun 2026).
@@ -409,7 +419,7 @@ const REAL_RESULTS = {
 };
 const PROVISIONAL = [];
 const REAL_RESULTS_DATE = "28 Jun 2026";    // when the stored real results were last refreshed
-const REAL_RESULTS_VERSION = "2026-06-28";  // bump this when results change → auto-applies on next open
+const REAL_RESULTS_VERSION = "2026-06-28b";  // bump this when results change → auto-applies on next open
 
 // Real group-stage points per team (official standings, 26 Jun 2026).
 const REAL_POINTS = {
@@ -426,6 +436,20 @@ const REAL_POINTS = {
  "Colombia":7,"Portugal":5,"DR Congo":4,"Uzbekistan":0,
  "England":7,"Ghana":4,"Croatia":6,"Panama":0
 };
+// Real knockout results, keyed by "round-index" (round 0 = Round of 32, 1 = R16, 2 = QF,
+// 3 = SF, 4 = Final). g = goals by team name (regulation/ET); pg = penalty-shootout goals
+// (only when the tie went to penalties); w = the team that actually advanced. Add entries
+// here as real knockout games finish — the bracket then locks + shows them. NEVER invent one.
+const REAL_KO = {
+ // Round of 32 (as of 28 Jun 2026)
+ "0-0":{g:{"Germany":1,"Paraguay":1}, pg:{"Germany":3,"Paraguay":4}, w:"Paraguay"},   // Paraguay win 4-3 pens
+ "0-1":{g:{"France":3,"Sweden":0}, w:"France"},
+ "0-2":{g:{"South Africa":0,"Canada":1}, w:"Canada"},
+ "0-3":{g:{"Netherlands":1,"Morocco":1}, pg:{"Netherlands":2,"Morocco":3}, w:"Morocco"}, // Morocco win 3-2 pens
+ "0-8":{g:{"Brazil":2,"Japan":1}, w:"Brazil"},
+ "0-9":{g:{"Ivory Coast":1,"Norway":2}, w:"Norway"}
+};
+function realKO(round,idx){ return REAL_KO[round+"-"+idx]||null; }
 // adidas Golden Boot race — every reported scorer so far (real, 26 Jun 2026).
 const ALL_SCORERS = [
  {n:"Lionel Messi",c:"Argentina",g:5},
@@ -840,6 +864,10 @@ function renderThirds(){
 // slot's eligibility (bipartite matching, Kuhn's algorithm). Returns slot->group letter.
 function getMatching(){
   const groups = state.thirds.slice().sort();
+  // Real qualifiers in play → use the official FIFA allocation table (exact bracket).
+  if(REAL_THIRD_SLOTS && groups.join("")===REAL_THIRD_SLOTS.slice().sort().join("")){
+    return REAL_THIRD_SLOTS.slice();
+  }
   const adj = {};
   groups.forEach(g => adj[g] = THIRD_SLOT_ELIG.map((e,i)=>e.includes(g)?i:-1).filter(i=>i>=0));
   const matchSlot = new Array(THIRD_SLOT_ELIG.length).fill(null);
@@ -870,6 +898,8 @@ function matchTeams(round, idx){
 }
 function winnerOf(round, idx){
   const [a,b]=matchTeams(round,idx);
+  const rk=realKO(round,idx);
+  if(rk && a && b && (rk.w===a || rk.w===b)) return rk.w; // real result locks the winner
   const pick=state.picks[round+"-"+idx];
   if(pick && (pick===a || pick===b)) return pick; // stale picks auto-ignored
   return null;
@@ -890,6 +920,8 @@ function autoPlayBracket(onlyEmpty){
   [16,8,4,2,1].forEach((cnt,round)=>{
     for(let i=0;i<cnt;i++){
       const [a,b]=matchTeams(round,i); if(!a||!b) continue;
+      const rk=realKO(round,i);
+      if(rk && (rk.w===a||rk.w===b)){ state.picks[round+"-"+i]=rk.w; continue; } // real result wins
       const cur=state.picks[round+"-"+i];
       if(onlyEmpty && (cur===a||cur===b)) continue;   // keep the user's still-valid pick
       state.picks[round+"-"+i]=(str(a)>=str(b)?a:b);
@@ -1010,9 +1042,15 @@ function grow(name,round,idx,winner,seed){
   const s=document.createElement("div");
   const seedHtml=`<span class="seed">${seed||""}</span>`;
   if(!name){ s.className="grow empty"; s.innerHTML=`${seedHtml}<span class="flag">·</span><span class="nm">—</span>`; return s; }
-  s.className="grow"+(winner===name?" win":"");
-  s.innerHTML=`${seedHtml}<span class="flag">${FLAG[name]||"🏳️"}</span><span class="nm">${tname(name)}</span>`;
-  s.onclick=()=>{ state.picks[round+"-"+idx]=name; save(); rerenderBracket(); };
+  const rk=realKO(round,idx);                       // real, finished knockout game?
+  let scoreHtml="";
+  if(rk && rk.g && (name in rk.g)){
+    const pen = rk.pg && (name in rk.pg) ? `<sup class="pen">(${rk.pg[name]})</sup>` : "";
+    scoreHtml=`<span class="score">${rk.g[name]}${pen}</span>`;
+  }
+  s.className="grow"+(winner===name?" win":"")+(rk?" locked":"");
+  s.innerHTML=`${seedHtml}<span class="flag">${FLAG[name]||"🏳️"}</span><span class="nm">${tname(name)}</span>${scoreHtml}`;
+  if(!rk) s.onclick=()=>{ state.picks[round+"-"+idx]=name; save(); rerenderBracket(); }; // real games are locked
   return s;
 }
 
@@ -1250,6 +1288,7 @@ document.addEventListener("click",(e)=>{
 if(state.realVersion !== REAL_RESULTS_VERSION){
   LETTERS.forEach(L=> state.ranks[L] = REAL_RESULTS[L].slice(0,3));
   state.realVersion = REAL_RESULTS_VERSION;
+  state.fillReal = true;   // re-fill the bracket so new real results (groups + knockouts) show
   save();
 }
 
